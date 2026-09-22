@@ -1,4 +1,4 @@
-# qArt-code 🎨📱
+# qArt-code
 
 > A fully decentralized, customizable, and client-side QR Code Studio built for **Artizens**.
 
