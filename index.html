@@ -124,15 +124,15 @@
       justify-content: space-between;
     }
 
-    /* Animated sporadic floating QR element */
-    #header-floating-qr {
+    /* Header Background QR-like Matrix Canvas */
+    #header-background-canvas {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      z-index: 5; /* Above banner, below content */
-      width: 100px;
-      height: 100px;
+      z-index: 2.5; /* Above overlay & banners, below content */
     }
 
     .ipfs-logo {
@@ -340,7 +340,7 @@
 </head>
 <body>
 
-  <!-- Particle canvas for connection lines animation -->
+  <!-- Particle canvas for main body connection lines animation -->
   <canvas id="particle-canvas"></canvas>
 
   <header>
@@ -348,8 +348,8 @@
     <div class="banner-layer banner-2"></div>
     <div class="header-overlay"></div>
 
-    <!--Sporadic floating animated qrcode inside header-->
-    <canvas id="header-floating-qr"></canvas>
+    <!-- Header QR-like matrix animation canvas -->
+    <canvas id="header-background-canvas"></canvas>
 
     <div class="header-content">
       <img src="./IPFS_Logo.png" alt="IPFS Logo" class="ipfs-logo">
@@ -383,7 +383,7 @@
       <input type="file" id="fileInput" accept="image/*" style="margin-bottom: 6px;">
       
       <label>Or Image URL / IPFS Gateway</label>
-      <input type="text" id="imageUrl" value="./Ens_Eth_Breathe.gif" oninput="updateQR()">
+      <input type="text" id="imageUrl" value="https://bafybeibwhoqzf6nxsh5ctqx5o4uezwhnqncm3uztaimzuvcfljfcjwknqi.ipfs.inbrowser.link/Artizen_Logo.png" oninput="updateQR()">
 
       <div class="row">
         <div>
@@ -479,7 +479,7 @@
       <p>🔗 <a href="https://github.com/TheJollyLaMa/qArt-code" target="_blank">View the Project Repo</a></p>
       
       <p style="font-family: 'Great Vibes', cursive; font-size: 0.9em; border-top: 1px solid var(--border-soft); padding-top: 15px;">
-        <strong >TheJollyLaMa.eth</strong>
+        <strong>TheJollyLaMa.eth</strong>
       </p>
     </div>
   </div>
@@ -493,7 +493,7 @@
       margin: 10,
       type: "canvas",
       data: "https://thejollylama.github.io/qArt-code/",
-      image: "https://bafybeibwhoqzf6nxsh5ctqx5o4uezwhnqncm3uztaimzuvcfljfcjwknqi.ipfs.inbrowser.link/Artizen_Logo.png", /* Use correct image for artizen in center by default */
+      image: "https://bafybeibwhoqzf6nxsh5ctqx5o4uezwhnqncm3uztaimzuvcfljfcjwknqi.ipfs.inbrowser.link/Artizen_Logo.png",
       dotsOptions: { color: "#111111", type: "extra-rounded" },
       backgroundOptions: { color: "#ffffff" },
       imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
@@ -593,7 +593,7 @@
       }
     }
 
-    /* Connection particles canvas logic */
+    /* Main Body Connection Particles Canvas Logic */
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -649,46 +649,84 @@
 
     animateParticles();
 
-    /* Header sporadic floating QR animation */
-    const floatingQrCanvas = document.getElementById('header-floating-qr');
-    const floatingQrCtx = floatingQrCanvas.getContext('2d');
-    
-    // Position qrcode image data uri here (just use dummy or real base64 if available)
-    const qrImage = new Image();
-    qrImage.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><rect x="10" y="10" width="20" height="20" fill="black"/><rect x="70" y="10" width="20" height="20" fill="black"/><rect x="10" y="70" width="20" height="20" fill="black"/><rect x="40" y="40" width="20" height="20" fill="black"/><rect x="70" y="70" width="10" height="10" fill="black"/><rect x="80" y="80" width="10" height="10" fill="black"/></svg>';
-    
-    const qrSize = 100;
-    
-    function moveQr() {
-        const header = document.querySelector('header');
-        const headerRect = header.getBoundingClientRect();
-        
-        // Random placement within header bounds
-        const x = Math.random() * (headerRect.width - qrSize);
-        const y = Math.random() * (headerRect.height - qrSize);
-        
-        floatingQrCanvas.width = headerRect.width;
-        floatingQrCanvas.height = headerRect.height;
-        
-        floatingQrCtx.clearRect(0,0, floatingQrCanvas.width, floatingQrCanvas.height);
-        
-        floatingQrCtx.drawImage(qrImage, x, y, qrSize, qrSize);
-        
-        // Use dots/connections style elements on floating qr for blending
-        floatingQrCtx.beginPath();
-        floatingQrCtx.fillStyle = '#26a69a';
-        floatingQrCtx.arc(x + qrSize / 2, y + qrSize / 2, 5, 0, Math.PI * 2);
-        floatingQrCtx.fill();
-        
-        floatingQrCtx.beginPath();
-        floatingQrCtx.strokeStyle = 'rgba(38, 166, 154, 0.5)';
-        floatingQrCtx.moveTo(x + qrSize / 2, y + qrSize / 2);
-        floatingQrCtx.lineTo(headerRect.width / 2, headerRect.height / 2); // Connect sporadically to center title or logo...
-        floatingQrCtx.stroke();
-        
-        setTimeout(moveQr, Math.random() * 3000 + 1000); // sporadic timing
+    /* Header QR Dot-Matrix Background Animation Logic */
+    const headerCanvas = document.getElementById('header-background-canvas');
+    const headerCtx = headerCanvas.getContext('2d');
+
+    function resizeHeaderCanvas() {
+      const headerEl = document.querySelector('header');
+      headerCanvas.width = headerEl.clientWidth;
+      headerCanvas.height = headerEl.clientHeight;
     }
-    qrImage.onload = moveQr;
+    resizeHeaderCanvas();
+    window.addEventListener('resize', resizeHeaderCanvas);
+
+    let headerParticles = [];
+    const gridRows = 6;
+    const gridCols = Math.floor(window.innerWidth / 35);
+    const jitterFactor = 6;
+
+    function initHeaderMatrix() {
+      headerParticles = [];
+      const colWidth = headerCanvas.width / gridCols;
+      const rowHeight = headerCanvas.height / gridRows;
+
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          headerParticles.push({
+            x: c * colWidth + colWidth / 2 + (Math.random() - 0.5) * jitterFactor,
+            y: r * rowHeight + rowHeight / 2 + (Math.random() - 0.5) * jitterFactor,
+            homeX: c * colWidth + colWidth / 2,
+            homeY: r * rowHeight + rowHeight / 2,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 1.5 + 2
+          });
+        }
+      }
+    }
+    initHeaderMatrix();
+
+    function animateHeaderParticles() {
+      headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
+
+      for (let i = 0; i < headerParticles.length; i++) {
+        let p1 = headerParticles[i];
+
+        p1.x += p1.vx;
+        p1.y += p1.vy;
+
+        // Keep dots close to matrix positions to retain grid structure
+        if (Math.abs(p1.x - p1.homeX) > jitterFactor * 1.5) p1.vx *= -1;
+        if (Math.abs(p1.y - p1.homeY) > jitterFactor * 1.5) p1.vy *= -1;
+
+        headerCtx.beginPath();
+        headerCtx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
+        headerCtx.fillStyle = '#26a69a';
+        headerCtx.fill();
+
+        // Connect neighboring dots in matrix for connector style
+        const maxDist = 65;
+        for (let j = i + 1; j < headerParticles.length; j++) {
+          let p2 = headerParticles[j];
+          let dx = p1.x - p2.x;
+          let dy = p1.y - p2.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < maxDist) {
+            headerCtx.beginPath();
+            headerCtx.moveTo(p1.x, p1.y);
+            headerCtx.lineTo(p2.x, p2.y);
+            headerCtx.strokeStyle = `rgba(38, 166, 154, ${(1 - dist / maxDist) * 0.45})`;
+            headerCtx.lineWidth = 0.75;
+            headerCtx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateHeaderParticles);
+    }
+
+    animateHeaderParticles();
 
   </script>
 </body>
