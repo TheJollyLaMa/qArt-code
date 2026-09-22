@@ -8,7 +8,7 @@
   <!-- Umbrella QR Favicon -->
   <link rel="icon" href="./favicon.png">
   
-  <!-- Google Smooth Cursive Font -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
 
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
@@ -98,18 +98,18 @@
     }
 
     @keyframes crossFade {
-      0% { opacity: 0.15; }
-      40% { opacity: 0.75; }
-      50% { opacity: 0.75; }
-      90% { opacity: 0.15; }
-      100% { opacity: 0.15; }
+      0% { opacity: 0.10; }
+      40% { opacity: 0.45; }
+      50% { opacity: 0.45; }
+      90% { opacity: 0.10; }
+      100% { opacity: 0.10; }
     }
 
     .header-overlay {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(14, 32, 23, 0.4);
-      backdrop-filter: blur(2px);
+      background: rgba(10, 24, 18, 0.65);
+      backdrop-filter: blur(3px);
       z-index: 2;
     }
 
@@ -124,7 +124,7 @@
       justify-content: space-between;
     }
 
-    /* Header Background QR-like Matrix Canvas */
+    /* Header Background Canvas */
     #header-background-canvas {
       position: absolute;
       top: 0;
@@ -147,10 +147,17 @@
       transform: scale(1.05);
     }
 
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
     #main-title {
       font-family: 'Great Vibes', cursive;
       font-size: 3.6rem;
-      cursor: pointer;
+      line-height: 0.95;
       text-align: center;
       color: var(--primary-glow);
       text-shadow: 
@@ -160,13 +167,27 @@
       transition: transform 0.2s ease, text-shadow 0.3s ease, color 0.3s ease;
     }
 
-    #main-title:hover {
+    .title-subtitle {
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      opacity: 0.85;
+      margin-top: 2px;
+      transition: color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .title-group:hover #main-title {
       transform: scale(1.03);
       color: #ffffff;
       text-shadow: 
         0 0 8px var(--secondary-glow),
         0 0 16px var(--secondary-glow),
         0 0 32px var(--secondary-glow);
+    }
+
+    .title-group:hover .title-subtitle {
+      color: var(--secondary-glow);
+      opacity: 1;
     }
 
     .header-spacer { width: 42px; }
@@ -364,14 +385,19 @@
     <div class="banner-layer banner-2"></div>
     <div class="header-overlay"></div>
 
-    <!-- Header QR Crawling Swarm Canvas -->
+    <!-- Header Canvas -->
     <canvas id="header-background-canvas"></canvas>
 
     <div class="header-content">
       <a href="https://artizen.fund" target="_blank" title="Visit Artizen Fund">
         <img src="./Artizen_Logo.png" alt="Artizen Logo" class="ipfs-logo">
       </a>
-      <div id="main-title" onclick="openModal()">qArt-Code</div>
+      
+      <div class="title-group" onclick="openModal()">
+        <div id="main-title">qArt-Code</div>
+        <div class="title-subtitle">(another decent frankenstein)</div>
+      </div>
+
       <div class="header-spacer"></div>
     </div>
   </header>
@@ -488,8 +514,8 @@
     <div id="about-content">
       <span id="close-modal" onclick="closeModal()">&times;</span>
       <h2>About qArt-Code</h2>
-      <p>qArt-Code is a custom QR studio designed for creators in the Artizen ecosystem.</p>
-      <p>A decent place where art and utility intersect.</p>
+      <p>Use qArt-Code to direct people toward your project!</p>
+      <p>Another decent frankenstein where art and utility intersect.</p>
       
       <p><strong>What to do:</strong></p>
       <ul>
@@ -526,7 +552,6 @@
       qrOptions: { errorCorrectionLevel: 'H' }
     });
 
-    // Append and trigger initial rendering
     window.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById("canvas");
       container.innerHTML = "";
@@ -578,7 +603,6 @@
       const imageUrlInput = document.getElementById("imageUrl").value;
       const activeImage = uploadedBase64Image || imageUrlInput;
 
-      // Match subtext font color to dot color for design consistency
       const dotColor = document.getElementById("dotColor").value;
       const bgColor = document.getElementById("bgColor").value;
       document.getElementById("qr-subtext").style.color = dotColor;
@@ -619,7 +643,6 @@
         return;
       }
 
-      // Render merged canvas with subtext for PNG download
       const rawCanvas = document.querySelector("#canvas canvas");
       if (!rawCanvas) {
         qrCode.download({ name: "qArt-code", extension: ext });
@@ -634,20 +657,16 @@
       mergedCanvas.width = rawCanvas.width + (padding * 2);
       mergedCanvas.height = rawCanvas.height + (padding * 2) + subtextHeight;
 
-      // Fill background
       ctx.fillStyle = document.getElementById("bgColor").value;
       ctx.fillRect(0, 0, mergedCanvas.width, mergedCanvas.height);
 
-      // Draw original QR canvas
       ctx.drawImage(rawCanvas, padding, padding);
 
-      // Draw subtext
       ctx.fillStyle = document.getElementById("dotColor").value;
       ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(subtext, mergedCanvas.width / 2, rawCanvas.height + padding + 24);
 
-      // Trigger download
       const link = document.createElement("a");
       link.download = "qArt-code.png";
       link.href = mergedCanvas.toDataURL("image/png");
@@ -659,6 +678,7 @@
     }
 
     function closeModal() {
+      document.getElementById("about-modal").classList.remove("close");
       document.getElementById("about-modal").classList.remove("open");
     }
 
@@ -725,7 +745,7 @@
 
     animateParticles();
 
-    /* Header Crawling QR Worm / Swarm Animation */
+    /* Header Crawling Swarm Animation (Brightened & Glowing) */
     const headerCanvas = document.getElementById('header-background-canvas');
     const headerCtx = headerCanvas.getContext('2d');
 
@@ -787,12 +807,16 @@
             headerCtx.beginPath();
             headerCtx.moveTo(absX1, absY1);
             headerCtx.lineTo(absX2, absY2);
-            headerCtx.lineWidth = 1.8;
-            headerCtx.strokeStyle = `rgba(38, 166, 154, ${(1 - dist / maxDist) * 0.7})`;
+            headerCtx.lineWidth = 2.2;
+            headerCtx.strokeStyle = `rgba(52, 211, 153, ${(1 - dist / maxDist) * 0.95})`;
             headerCtx.stroke();
           }
         }
       }
+
+      // Add neon glow to swarm particles
+      headerCtx.shadowColor = '#26e6a3';
+      headerCtx.shadowBlur = 10;
 
       for (let i = 0; i < swarmDots.length; i++) {
         let dot = swarmDots[i];
@@ -806,19 +830,21 @@
         let posX = wormHeadX + dot.offsetX;
         let posY = centerY + dot.offsetY;
 
-        headerCtx.fillStyle = '#26a69a';
+        headerCtx.fillStyle = '#34d399';
 
         if (dot.isSquare) {
-          const r = dot.radius * 1.6;
+          const r = dot.radius * 1.8;
           headerCtx.beginPath();
           headerCtx.roundRect(posX - r / 2, posY - r / 2, r, r, 2);
           headerCtx.fill();
         } else {
           headerCtx.beginPath();
-          headerCtx.arc(posX, posY, dot.radius, 0, Math.PI * 2);
+          headerCtx.arc(posX, posY, dot.radius * 1.1, 0, Math.PI * 2);
           headerCtx.fill();
         }
       }
+
+      headerCtx.shadowBlur = 0;
 
       requestAnimationFrame(animateHeaderSwarm);
     }
