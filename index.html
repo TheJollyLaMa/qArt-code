@@ -5,15 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>qArt-Code</title>
   
-  <!-- Umbrella QR Favicon -->
   <link rel="icon" href="./favicon.png">
-  
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
 
-  <!-- Core QR Styling Library -->
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-  <!-- Animated GIF Generation Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
   
@@ -26,42 +21,38 @@
       --primary-glow: #26a69a;
       --secondary-glow: #ffca28;
       --border-soft: rgba(63, 110, 89, 0.35);
+
+      /* Dynamic Shimmer Variables */
+      --shimmer-c1: #111111;
+      --shimmer-c2: #26a69a;
+      --shimmer-c3: #ffca28;
+      --shimmer-speed: 3s;
     }
 
     * { box-sizing: border-box; }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background-color: var(--bg-deep);
       color: var(--text-main);
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       min-height: 100vh;
       position: relative;
     }
 
-    /* Particle Connection Canvas Layer */
     #particle-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 1;
-      pointer-events: none;
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1; pointer-events: none;
     }
 
-    /* Moving background */
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: url('./qArt_code_background.jpeg') center/cover no-repeat;
-      opacity: 0.35;
-      filter: blur(2px);
-      z-index: 0;
-      animation: bgScroll 60s linear infinite;
+      opacity: 0.35; filter: blur(2px);
+      z-index: 0; animation: bgScroll 60s linear infinite;
     }
 
     @keyframes bgScroll {
@@ -69,24 +60,16 @@
       100% { background-position: center bottom; }
     }
 
-    /* Header Container */
     header {
-      position: relative;
-      height: 110px;
+      position: relative; height: 110px;
       border-bottom: 2px solid var(--border-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; z-index: 10;
     }
 
     .banner-layer {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-size: cover;
-      background-position: center;
-      z-index: 1;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover; background-position: center; z-index: 1;
     }
 
     .banner-1 {
@@ -109,242 +92,135 @@
     }
 
     .header-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(8, 20, 15, 0.7);
-      backdrop-filter: blur(2px);
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(8, 20, 15, 0.7); backdrop-filter: blur(2px);
       z-index: 2;
     }
 
     .header-content {
-      position: relative;
-      z-index: 3;
-      width: 100%;
-      max-width: 1200px;
-      padding: 0 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: relative; z-index: 3; width: 100%; max-width: 1200px;
+      padding: 0 30px; display: flex; align-items: center; justify-content: space-between;
     }
 
     #header-background-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 2.5;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 2.5;
     }
 
     .ipfs-logo {
-      height: 42px;
-      width: auto;
-      opacity: 0.85;
+      height: 42px; width: auto; opacity: 0.85;
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
+    .ipfs-logo:hover { opacity: 1; transform: scale(1.05); }
 
-    .ipfs-logo:hover {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-
-    .title-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
+    .title-group { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 
     #main-title {
-      font-family: 'Great Vibes', cursive;
-      font-size: 3.6rem;
-      line-height: 0.95;
-      text-align: center;
-      color: var(--primary-glow);
-      text-shadow: 
-        0 0 5px var(--primary-glow),
-        0 0 12px var(--primary-glow),
-        0 0 24px var(--primary-glow);
+      font-family: 'Great Vibes', cursive; font-size: 3.6rem; line-height: 0.95;
+      text-align: center; color: var(--primary-glow);
+      text-shadow: 0 0 5px var(--primary-glow), 0 0 12px var(--primary-glow), 0 0 24px var(--primary-glow);
       transition: transform 0.2s ease, text-shadow 0.3s ease, color 0.3s ease;
     }
 
     .title-subtitle {
-      font-size: 0.78rem;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      opacity: 0.85;
-      margin-top: 2px;
+      font-size: 0.78rem; letter-spacing: 0.5px; color: var(--text-muted); opacity: 0.85; margin-top: 2px;
       transition: color 0.3s ease, opacity 0.3s ease;
     }
 
     .title-group:hover #main-title {
-      transform: scale(1.03);
-      color: #ffffff;
-      text-shadow: 
-        0 0 8px var(--secondary-glow),
-        0 0 16px var(--secondary-glow),
-        0 0 32px var(--secondary-glow);
+      transform: scale(1.03); color: #ffffff;
+      text-shadow: 0 0 8px var(--secondary-glow), 0 0 16px var(--secondary-glow), 0 0 32px var(--secondary-glow);
     }
 
-    .title-group:hover .title-subtitle {
-      color: var(--secondary-glow);
-      opacity: 1;
-    }
+    .title-group:hover .title-subtitle { color: var(--secondary-glow); opacity: 1; }
 
     .header-spacer { width: 42px; }
 
     main {
-      position: relative;
-      z-index: 10;
-      flex: 1;
-      display: flex;
-      gap: 30px;
-      padding: 30px;
+      position: relative; z-index: 10; flex: 1;
+      display: flex; gap: 30px; padding: 30px;
     }
 
     .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 400px;
-      max-height: 85vh;
-      overflow-y: auto;
-      background: var(--bg-panel);
-      backdrop-filter: blur(16px);
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid var(--border-soft);
+      display: flex; flex-direction: column; gap: 12px;
+      width: 420px; max-height: 85vh; overflow-y: auto;
+      background: var(--bg-panel); backdrop-filter: blur(16px);
+      padding: 24px; border-radius: 12px; border: 1px solid var(--border-soft);
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     h3.control-group-title {
-      margin: 12px 0 0;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-soft);
+      margin: 12px 0 0; font-size: 0.85rem; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-muted); border-bottom: 1px solid var(--border-soft);
       padding-bottom: 4px;
     }
 
-    label { font-size: 0.85rem; font-weight: 600; color: #fff; }
+    label { font-size: 0.82rem; font-weight: 600; color: #fff; }
 
     input[type="text"], input[type="number"], select {
-      width: 100%;
-      padding: 10px;
-      background: rgba(10, 24, 18, 0.65);
-      border: 1px solid var(--border-soft);
-      border-radius: 6px;
-      color: var(--text-main);
-      transition: border-color 0.2s ease;
+      width: 100%; padding: 8px 10px;
+      background: rgba(10, 24, 18, 0.65); border: 1px solid var(--border-soft);
+      border-radius: 6px; color: var(--text-main); transition: border-color 0.2s ease;
     }
 
-    input[type="text"]:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-glow);
-    }
+    input[type="text"]:focus, select:focus { outline: none; border-color: var(--primary-glow); }
 
     .row { display: flex; gap: 10px; align-items: center; }
     .row > div { flex: 1; }
 
     input[type="color"] {
-      width: 100%;
-      height: 36px;
-      border: none;
-      border-radius: 6px;
-      background: none;
-      cursor: pointer;
+      width: 100%; height: 34px; border: none; border-radius: 6px; background: none; cursor: pointer;
     }
 
     #preview-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-panel);
-      backdrop-filter: blur(16px);
-      border-radius: 12px;
-      border: 1px solid var(--border-soft);
-      padding: 40px;
-      position: relative;
-      min-height: 400px;
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: var(--bg-panel); backdrop-filter: blur(16px);
+      border-radius: 12px; border: 1px solid var(--border-soft);
+      padding: 40px; position: relative; min-height: 400px;
     }
 
     #corner-logo {
       position: absolute; bottom: 20px; right: 20px;
-      width: 50px; opacity: 0.6; transition: opacity 0.3s ease;
-      cursor: default;
+      width: 50px; opacity: 0.6; transition: opacity 0.3s ease; cursor: default;
     }
     #corner-logo:hover { opacity: 0.9; }
 
-    /* Outer Wrapper with Sparkle Layering */
-    .qr-card-outer {
-      position: relative;
-      padding: 6px;
-      border-radius: 18px;
-    }
+    .qr-card-outer { position: relative; padding: 6px; border-radius: 18px; }
 
     #sparkle-canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 2;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 2;
     }
 
     #qr-wrapper {
-      position: relative;
-      z-index: 1;
-      background: #ffffff;
-      padding: 16px 16px 12px 16px;
-      border-radius: 12px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-      transition: transform 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: relative; z-index: 1; background: #ffffff;
+      padding: 16px 16px 12px 16px; border-radius: 12px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       max-width: 100%;
     }
 
     #qr-wrapper:hover { transform: scale(1.02); }
 
     #canvas {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      max-width: 100%;
-      overflow: hidden;
-      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      max-width: 100%; overflow: hidden; position: relative;
     }
 
-    #canvas canvas {
-      max-width: 100% !important;
-      height: auto !important;
-      position: relative;
-      z-index: 1;
-    }
+    #canvas canvas { max-width: 100% !important; height: auto !important; position: relative; z-index: 1; }
 
-    /* Subtext Styling & Animated Shimmer */
     #qr-subtext {
-      margin-top: 8px;
-      font-size: 1rem;
-      font-weight: 700;
-      color: #111111;
-      text-align: center;
-      font-family: inherit;
-      letter-spacing: 0.5px;
-      word-break: break-word;
+      margin-top: 8px; font-size: 1rem; font-weight: 700; color: #111111;
+      text-align: center; font-family: inherit; letter-spacing: 0.5px; word-break: break-word;
     }
 
     #qr-subtext.shimmer-active {
-      background: linear-gradient(90deg, #111111 0%, #26a69a 25%, #ffca28 50%, #26a69a 75%, #111111 100%);
+      background: linear-gradient(90deg, var(--shimmer-c1) 0%, var(--shimmer-c2) 50%, var(--shimmer-c3) 100%);
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: textShimmer 3s linear infinite;
+      animation: textShimmer var(--shimmer-speed) linear infinite;
     }
 
     @keyframes textShimmer {
@@ -354,74 +230,45 @@
 
     .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
     button {
-      flex: 1 1 45%;
-      padding: 12px;
+      flex: 1 1 45%; padding: 12px;
       background: linear-gradient(to bottom, #4db6ac, #009688);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
+      color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     button.secondary { background: linear-gradient(to bottom, #546e7a, #37474f); }
     button.accent { background: linear-gradient(to bottom, #ffca28, #f57f17); color: #000; }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
 
     .alert {
-      display: none;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      line-height: 1.3;
-      margin-bottom: 10px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+      display: none; padding: 10px 14px; border-radius: 6px; font-size: 0.8rem;
+      line-height: 1.3; margin-bottom: 10px; box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     }
     #contrast-warning { background: #ef444422; border: 1px solid #ef4444; color: #fca5a5; }
     #length-info { background: #3b82f622; border: 1px solid #3b82f6; color: #93c5fd; }
 
-    /* Modal */
     #about-modal {
-      display: none;
-      position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(8, 20, 15, 0.75);
-      backdrop-filter: blur(8px);
+      display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(8, 20, 15, 0.75); backdrop-filter: blur(8px);
       align-items: center; justify-content: center;
     }
 
     #about-modal.open { display: flex; }
 
     #about-content {
-      background: rgba(22, 40, 32, 0.65);
-      backdrop-filter: blur(20px);
-      color: #fff;
-      padding: 40px;
-      border-radius: 16px;
-      border: 2px solid var(--border-soft);
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-      position: relative;
+      background: rgba(22, 40, 32, 0.65); backdrop-filter: blur(20px);
+      color: #fff; padding: 40px; border-radius: 16px; border: 2px solid var(--border-soft);
+      max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); position: relative;
     }
 
-    #close-modal {
-      position: absolute; top: 15px; right: 20px;
-      font-size: 1.5rem; color: var(--text-muted); cursor: pointer;
-    }
+    #close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
     #close-modal:hover { color: #fff; }
-
     #about-content h2 { color: #fff; margin-bottom: 20px; }
     #about-content p { color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
     #about-content ul { color: var(--text-muted); margin-bottom: 20px; }
     #about-content a { color: var(--primary-glow); font-weight: bold; text-decoration: none; }
     #about-content a:hover { color: #fff; text-shadow: 0 0 5px var(--primary-glow); }
 
-    /* Mobile Layout */
     @media (max-width: 768px) {
       header { height: auto; padding: 12px 0; }
       .header-content { padding: 0 15px; }
@@ -439,15 +286,12 @@
 </head>
 <body>
 
-  <!-- Particle canvas for main body connection lines animation -->
   <canvas id="particle-canvas"></canvas>
 
   <header>
     <div class="banner-layer banner-1"></div>
     <div class="banner-layer banner-2"></div>
     <div class="header-overlay"></div>
-
-    <!-- Header Canvas -->
     <canvas id="header-background-canvas"></canvas>
 
     <div class="header-content">
@@ -492,11 +336,11 @@
       <input type="file" id="bgFileInput" accept="image/*" style="margin-bottom: 6px;">
       
       <label>Or Watermark Image URL</label>
-      <input type="text" id="bgImageUrl" placeholder="./qArt_code_background.jpeg" oninput="updateQR()">
+      <input type="text" id="bgImageUrl" value="./qArt_code_background.jpeg" placeholder="./qArt_code_background.jpeg" oninput="updateQR()">
 
       <div class="row" style="margin-top: 6px;">
         <div>
-          <label>Watermark Opacity</label>
+          <label>Watermark Opacity (0 to 1)</label>
           <input type="number" id="bgOpacity" value="0.25" step="0.05" min="0" max="1" oninput="updateQR()">
         </div>
       </div>
@@ -569,8 +413,8 @@
         <div>
           <label>Frame Gradient</label>
           <select id="cornerSquareGradientType" onchange="updateQR()">
-            <option value="none" selected>Solid Color</option>
-            <option value="linear">Linear</option>
+            <option value="none">Solid Color</option>
+            <option value="linear" selected>Linear</option>
             <option value="radial">Radial</option>
           </select>
         </div>
@@ -583,7 +427,7 @@
         </div>
         <div>
           <label>Frame Color 2</label>
-          <input type="color" id="cornerSquareColor2" value="#26a69a" onchange="updateQR()">
+          <input type="color" id="cornerSquareColor2" value="#a855f7" onchange="updateQR()">
         </div>
       </div>
 
@@ -599,9 +443,9 @@
         <div>
           <label>Eye Gradient</label>
           <select id="cornerEyeGradientType" onchange="updateQR()">
-            <option value="none" selected>Solid Color</option>
+            <option value="none">Solid Color</option>
             <option value="linear">Linear</option>
-            <option value="radial">Radial</option>
+            <option value="radial" selected>Radial</option>
           </select>
         </div>
       </div>
@@ -609,27 +453,77 @@
       <div class="row" style="margin-top: 6px;">
         <div>
           <label>Eye Color 1</label>
-          <input type="color" id="cornerEyeColor1" value="#26a69a" onchange="updateQR()">
+          <input type="color" id="cornerEyeColor1" value="#eab308" onchange="updateQR()">
         </div>
         <div>
           <label>Eye Color 2</label>
-          <input type="color" id="cornerEyeColor2" value="#ffca28" onchange="updateQR()">
+          <input type="color" id="cornerEyeColor2" value="#26a69a" onchange="updateQR()">
         </div>
       </div>
 
-      <h3 class="control-group-title">Animations & Effects</h3>
+      <h3 class="control-group-title">Text Shimmer Controls</h3>
       <div class="row">
         <div>
           <label style="cursor: pointer;">
-            <input type="checkbox" id="shimmerToggle" onchange="toggleShimmer()" checked> Text Shimmer Effect
+            <input type="checkbox" id="shimmerToggle" onchange="updateShimmerSettings()" checked> Enable Shimmer
           </label>
         </div>
+        <div>
+          <label>Speed (seconds)</label>
+          <input type="number" id="shimmerSpeed" value="3" step="0.5" min="0.5" max="10" oninput="updateShimmerSettings()">
+        </div>
       </div>
+
       <div class="row" style="margin-top: 6px;">
         <div>
+          <label>Shimmer Start Color</label>
+          <input type="color" id="shimmerColor1" value="#111111" onchange="updateShimmerSettings()">
+        </div>
+        <div>
+          <label>Mid Color</label>
+          <input type="color" id="shimmerColor2" value="#26a69a" onchange="updateShimmerSettings()">
+        </div>
+        <div>
+          <label>End Color</label>
+          <input type="color" id="shimmerColor3" value="#ffca28" onchange="updateShimmerSettings()">
+        </div>
+      </div>
+
+      <h3 class="control-group-title">Edge Sparkle Orbit Controls</h3>
+      <div class="row">
+        <div>
           <label style="cursor: pointer;">
-            <input type="checkbox" id="sparkleToggle" onchange="toggleSparkles()" checked> Edge Sparkle Orbit
+            <input type="checkbox" id="sparkleToggle" onchange="toggleSparkles()" checked> Enable Sparkles
           </label>
+        </div>
+        <div>
+          <label>Particle Count</label>
+          <input type="number" id="sparkleCount" value="18" min="2" max="60" oninput="initSparkles()">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Orbit Speed</label>
+          <input type="number" id="sparkleSpeed" value="0.004" step="0.001" min="0.001" max="0.02" oninput="initSparkles()">
+        </div>
+        <div>
+          <label>Sparkle Size (px)</label>
+          <input type="number" id="sparkleSize" value="3" min="1" max="10" oninput="initSparkles()">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Sparkle Color Mode</label>
+          <select id="sparkleColorMode" onchange="initSparkles()">
+            <option value="rainbow" selected>Rainbow Spectrum</option>
+            <option value="solid">Custom Solid Color</option>
+          </select>
+        </div>
+        <div>
+          <label>Solid Sparkle Color</label>
+          <input type="color" id="sparkleSolidColor" value="#00ffc8" onchange="initSparkles()">
         </div>
       </div>
 
@@ -690,11 +584,32 @@
       type: "canvas",
       data: "https://thejollylama.github.io/qArt-code/",
       image: "./Artizen_Logo.png",
-      dotsOptions: { color: "#111111", type: "extra-rounded" },
+      dotsOptions: {
+        type: "extra-rounded",
+        gradient: {
+          type: "linear",
+          rotation: 0.785398,
+          colorStops: [{ offset: 0, color: "#111111" }, { offset: 1, color: "#26a69a" }]
+        }
+      },
       backgroundOptions: { color: "#ffffff" },
       imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
-      cornersSquareOptions: { color: "#111111", type: "extra-rounded" },
-      cornersDotOptions: { color: "#26a69a", type: "dot" },
+      cornersSquareOptions: {
+        type: "extra-rounded",
+        gradient: {
+          type: "linear",
+          rotation: 0,
+          colorStops: [{ offset: 0, color: "#111111" }, { offset: 1, color: "#a855f7" }]
+        }
+      },
+      cornersDotOptions: {
+        type: "dot",
+        gradient: {
+          type: "radial",
+          rotation: 0,
+          colorStops: [{ offset: 0, color: "#eab308" }, { offset: 1, color: "#26a69a" }]
+        }
+      },
       qrOptions: { errorCorrectionLevel: 'H' }
     });
 
@@ -704,6 +619,7 @@
       qrCode.append(container);
       updateQR();
       updateSubtext();
+      updateShimmerSettings();
       initSparkles();
     });
 
@@ -740,14 +656,26 @@
       subtextEl.style.display = val.trim() ? "block" : "none";
     }
 
-    function toggleShimmer() {
+    function updateShimmerSettings() {
       const active = document.getElementById("shimmerToggle").checked;
       const subtextEl = document.getElementById("qr-subtext");
+      const root = document.documentElement;
+
+      const c1 = document.getElementById("shimmerColor1").value;
+      const c2 = document.getElementById("shimmerColor2").value;
+      const c3 = document.getElementById("shimmerColor3").value;
+      const speed = document.getElementById("shimmerSpeed").value + "s";
+
+      root.style.setProperty('--shimmer-c1', c1);
+      root.style.setProperty('--shimmer-c2', c2);
+      root.style.setProperty('--shimmer-c3', c3);
+      root.style.setProperty('--shimmer-speed', speed);
+
       if (active) {
         subtextEl.classList.add("shimmer-active");
       } else {
         subtextEl.classList.remove("shimmer-active");
-        subtextEl.style.color = document.getElementById("dotColor1").value;
+        subtextEl.style.color = c1;
       }
     }
 
@@ -799,7 +727,7 @@
       const bgColor = document.getElementById("bgColor").value;
       const subtextEl = document.getElementById("qr-subtext");
       if (!document.getElementById("shimmerToggle").checked) {
-        subtextEl.style.color = document.getElementById("dotColor1").value;
+        subtextEl.style.color = document.getElementById("shimmerColor1").value;
       }
       document.getElementById("qr-wrapper").style.backgroundColor = bgColor;
 
@@ -828,30 +756,44 @@
         cornersDotOptions: cornerEyeOpt
       });
 
-      // Render Translucent Watermark Overlay on top of background
-      setTimeout(applyWatermarkToCanvas, 100);
+      // Render Translucent Watermark Overlay reliably onto canvas
+      setTimeout(applyWatermarkToCanvas, 150);
     }
 
     function applyWatermarkToCanvas() {
       const bgImgSrc = uploadedWatermarkImage || document.getElementById("bgImageUrl").value;
-      const opacity = parseFloat(document.getElementById("bgOpacity").value) || 0;
+      const opacity = parseFloat(document.getElementById("bgOpacity").value);
       const qrCanvas = document.querySelector("#canvas canvas");
 
-      if (!qrCanvas) return;
+      if (!qrCanvas || isNaN(opacity) || opacity <= 0) return;
 
-      if (bgImgSrc && opacity > 0) {
-        const ctx = qrCanvas.getContext("2d");
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = bgImgSrc;
-        img.onload = () => {
-          ctx.save();
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.globalAlpha = opacity;
-          ctx.drawImage(img, 0, 0, qrCanvas.width, qrCanvas.height);
-          ctx.restore();
-        };
-      }
+      const ctx = qrCanvas.getContext("2d");
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = bgImgSrc;
+      img.onload = () => {
+        // Create an offscreen canvas to blend watermark over base background before dots
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = qrCanvas.width;
+        tempCanvas.height = qrCanvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        // 1. Fill base background color
+        tempCtx.fillStyle = document.getElementById("bgColor").value;
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        // 2. Draw watermark with user opacity
+        tempCtx.globalAlpha = opacity;
+        tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        // 3. Composite original QR code matrix on top
+        tempCtx.globalAlpha = 1.0;
+        tempCtx.drawImage(qrCanvas, 0, 0);
+
+        // 4. Paint final output back to active canvas
+        ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+        ctx.drawImage(tempCanvas, 0, 0);
+      };
     }
 
     async function downloadQR(ext) {
@@ -880,7 +822,7 @@
 
       ctx.drawImage(rawCanvas, padding, padding);
 
-      ctx.fillStyle = document.getElementById("dotColor1").value;
+      ctx.fillStyle = document.getElementById("shimmerColor1").value;
       ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(subtext, mergedCanvas.width / 2, rawCanvas.height + padding + 24);
@@ -891,7 +833,6 @@
       link.click();
     }
 
-    /* Animated GIF Capture */
     async function downloadGIF() {
       const btn = document.getElementById("gif-btn");
       const originalText = btn.innerText;
@@ -952,11 +893,16 @@
       syncSize();
       window.addEventListener('resize', syncSize);
 
-      const numSparkles = 18;
+      const numSparkles = parseInt(document.getElementById("sparkleCount").value) || 18;
+      const speedBase = parseFloat(document.getElementById("sparkleSpeed").value) || 0.004;
+      const baseSize = parseFloat(document.getElementById("sparkleSize").value) || 3;
+      const colorMode = document.getElementById("sparkleColorMode").value;
+      const solidColor = document.getElementById("sparkleSolidColor").value;
+
       const sparkles = Array.from({ length: numSparkles }, () => ({
         progress: Math.random(),
-        speed: 0.003 + Math.random() * 0.005,
-        size: Math.random() * 3 + 2,
+        speed: speedBase + (Math.random() * 0.002 - 0.001),
+        size: Math.max(1, baseSize + (Math.random() * 1.5 - 0.75)),
         hue: Math.random() * 60 + 160
       }));
 
@@ -986,11 +932,13 @@
             x = 0; y = h - (dist - (2 * w + h));
           }
 
+          const fill = colorMode === 'rainbow' ? `hsl(${s.hue}, 90%, 65%)` : solidColor;
+
           sCtx.save();
           sCtx.beginPath();
           sCtx.arc(x, y, s.size, 0, Math.PI * 2);
-          sCtx.fillStyle = `hsl(${s.hue}, 90%, 65%)`;
-          sCtx.shadowColor = `hsl(${s.hue}, 100%, 75%)`;
+          sCtx.fillStyle = fill;
+          sCtx.shadowColor = fill;
           sCtx.shadowBlur = 10;
           sCtx.fill();
           sCtx.restore();
@@ -1017,7 +965,7 @@
       }
     }
 
-    /* Main Body Connection Particles Canvas Logic */
+    /* Particle Background Animation */
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -1041,8 +989,7 @@
 
       for (let i = 0; i < particles.length; i++) {
         let p1 = particles[i];
-        p1.x += p1.vx;
-        p1.y += p1.vy;
+        p1.x += p1.vx; p1.y += p1.vy;
 
         if (p1.x < 0 || p1.x > canvas.width) p1.vx *= -1;
         if (p1.y < 0 || p1.y > canvas.height) p1.vy *= -1;
@@ -1070,7 +1017,6 @@
       }
       requestAnimationFrame(animateParticles);
     }
-
     animateParticles();
 
     /* Header Crawling Swarm Animation */
@@ -1108,7 +1054,6 @@
 
     function animateHeaderSwarm() {
       headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
-
       const canvasH = headerCanvas.height;
 
       wormHeadX += wormSpeed;
@@ -1149,9 +1094,7 @@
 
       for (let i = 0; i < swarmDots.length; i++) {
         let dot = swarmDots[i];
-
-        dot.offsetX += dot.vx;
-        dot.yPos += dot.vy;
+        dot.offsetX += dot.vx; dot.yPos += dot.vy;
 
         if (Math.abs(dot.offsetX) > 80) dot.vx *= -1;
         if (dot.yPos < 8 || dot.yPos > canvasH - 8) dot.vy *= -1;
@@ -1174,7 +1117,6 @@
       }
 
       headerCtx.shadowBlur = 0;
-
       requestAnimationFrame(animateHeaderSwarm);
     }
 
