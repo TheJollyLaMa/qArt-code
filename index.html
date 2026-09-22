@@ -529,7 +529,7 @@
       <div class="btn-group">
         <button onclick="downloadQR('png')">Download PNG</button>
         <button class="secondary" onclick="downloadQR('svg')">Download SVG</button>
-        <button class="accent" id="mp4-btn" onclick="downloadMP4()">Record MP4</button>
+        <button class="accent" id="mp4-btn" onclick="downloadMP4()">Record High Quality MP4 (40s)</button>
       </div>
     </div>
 
@@ -560,7 +560,7 @@
         <li>Paste your project URL or IPFS hash.</li>
         <li>Upload custom center logos or translucent watermark background graphics.</li>
         <li>Apply custom linear or radial gradients across matrix dots and corners.</li>
-        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or animated MP4 video!</li>
+        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or high-bitrate animated MP4 video!</li>
       </ul>
 
       <p><strong>Explore further:</strong></p>
@@ -755,7 +755,6 @@
         cornersDotOptions: cornerEyeOpt
       });
 
-      // Render Translucent Watermark Overlay reliably onto canvas
       setTimeout(applyWatermarkToCanvas, 150);
     }
 
@@ -771,25 +770,20 @@
       img.crossOrigin = "anonymous";
       img.src = bgImgSrc;
       img.onload = () => {
-        // Create an offscreen canvas to blend watermark over base background before dots
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = qrCanvas.width;
         tempCanvas.height = qrCanvas.height;
         const tempCtx = tempCanvas.getContext("2d");
 
-        // 1. Fill base background color
         tempCtx.fillStyle = document.getElementById("bgColor").value;
         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-        // 2. Draw watermark with user opacity
         tempCtx.globalAlpha = opacity;
         tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
 
-        // 3. Composite original QR code matrix on top
         tempCtx.globalAlpha = 1.0;
         tempCtx.drawImage(qrCanvas, 0, 0);
 
-        // 4. Paint final output back to active canvas
         ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
         ctx.drawImage(tempCanvas, 0, 0);
       };
@@ -835,24 +829,31 @@
     async function downloadMP4() {
       const btn = document.getElementById("mp4-btn");
       const originalText = btn.innerText;
-      btn.innerText = "Recording...";
       btn.disabled = true;
 
       const card = document.getElementById("card-outer");
+      const targetScale = 2; // Upscale 2x for sharp 1080p+ high resolution
+      const recWidth = card.clientWidth * targetScale;
+      const recHeight = card.clientHeight * targetScale;
+
       const recCanvas = document.createElement("canvas");
+      recCanvas.width = recWidth;
+      recCanvas.height = recHeight;
       const ctx = recCanvas.getContext("2d");
 
-      recCanvas.width = card.clientWidth;
-      recCanvas.height = card.clientHeight;
-
+      // High bitrate targeted for ~80MB across 40 seconds (~16 Mbps)
+      const targetBitrate = 16_000_000;
       const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
         ? 'video/mp4;codecs=avc1'
         : (MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm');
 
       const stream = recCanvas.captureStream(30);
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
-      const chunks = [];
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: mimeType,
+        videoBitsPerSecond: targetBitrate
+      });
 
+      const chunks = [];
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
@@ -862,7 +863,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         const ext = mimeType.includes("mp4") ? "mp4" : "webm";
-        link.download = `qArt-code-animated.${ext}`;
+        link.download = `qArt-code-hd-40s.${ext}`;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
@@ -873,24 +874,31 @@
 
       mediaRecorder.start();
 
-      const durationMs = 3000;
+      const durationSeconds = 40;
       const fps = 30;
-      const intervalMs = 1000 / fps;
-      const totalFrames = (durationMs / 1000) * fps;
+      const totalFrames = durationSeconds * fps;
       let currentFrame = 0;
 
       const recordInterval = setInterval(async () => {
+        currentFrame++;
+        const percent = Math.floor((currentFrame / totalFrames) * 100);
+        btn.innerText = `Recording HD... ${percent}% (40s)`;
+
         if (currentFrame >= totalFrames) {
           clearInterval(recordInterval);
           mediaRecorder.stop();
           return;
         }
 
-        const frameCanvas = await html2canvas(card, { backgroundColor: null, logging: false });
+        const frameCanvas = await html2canvas(card, {
+          scale: targetScale,
+          backgroundColor: null,
+          logging: false
+        });
+
         ctx.clearRect(0, 0, recCanvas.width, recCanvas.height);
-        ctx.drawImage(frameCanvas, 0, 0);
-        currentFrame++;
-      }, intervalMs);
+        ctx.drawImage(frameCanvas, 0, 0, recCanvas.width, recCanvas.height);
+      }, 1000 / fps);
     }
 
     /* Edge Sparkle Orbit System */
