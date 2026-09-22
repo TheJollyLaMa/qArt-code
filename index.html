@@ -16,12 +16,12 @@
   <style>
     :root {
       --bg-deep: #0e2017;
-      --bg-panel: rgba(26, 60, 44, 0.45);
+      --bg-panel: rgba(18, 42, 32, 0.22); /* Ultra-transparent panel background */
       --text-main: #e0f2f1;
       --text-muted: #80cbc4;
       --primary-glow: #26a69a;
       --secondary-glow: #ffca28;
-      --border-soft: rgba(63, 110, 89, 0.4);
+      --border-soft: rgba(63, 110, 89, 0.35);
     }
 
     * { box-sizing: border-box; }
@@ -55,8 +55,8 @@
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: url('./qArt_code_background.jpeg') center/cover no-repeat;
-      opacity: 0.25;
-      filter: blur(3px);
+      opacity: 0.35; /* Slightly increased for better visibility through transparent panels */
+      filter: blur(2px);
       z-index: 0;
       animation: bgScroll 60s linear infinite;
     }
@@ -98,18 +98,18 @@
     }
 
     @keyframes crossFade {
-      0% { opacity: 0.10; }
-      40% { opacity: 0.45; }
-      50% { opacity: 0.45; }
-      90% { opacity: 0.10; }
-      100% { opacity: 0.10; }
+      0% { opacity: 0.08; }
+      40% { opacity: 0.35; }
+      50% { opacity: 0.35; }
+      90% { opacity: 0.08; }
+      100% { opacity: 0.08; }
     }
 
     .header-overlay {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10, 24, 18, 0.65);
-      backdrop-filter: blur(3px);
+      background: rgba(8, 20, 15, 0.7); /* Darkened for strong contrast with neon animation */
+      backdrop-filter: blur(2px);
       z-index: 2;
     }
 
@@ -208,13 +208,13 @@
       gap: 12px;
       width: 380px;
       background: var(--bg-panel);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px); /* High blur keeps text crisp over transparent background */
       padding: 24px;
       border-radius: 12px;
       border: 1px solid var(--border-soft);
       max-height: 95%;
       overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     h3.control-group-title {
@@ -232,7 +232,7 @@
     input[type="text"], input[type="number"], select {
       width: 100%;
       padding: 10px;
-      background: rgba(14, 32, 23, 0.85);
+      background: rgba(10, 24, 18, 0.65);
       border: 1px solid var(--border-soft);
       border-radius: 6px;
       color: var(--text-main);
@@ -263,7 +263,7 @@
       align-items: center;
       justify-content: center;
       background: var(--bg-panel);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       border-radius: 12px;
       border: 1px solid var(--border-soft);
       padding: 40px;
@@ -272,10 +272,10 @@
 
     #corner-logo {
       position: absolute; bottom: 20px; right: 20px;
-      width: 50px; opacity: 0.5; transition: opacity 0.3s ease;
+      width: 50px; opacity: 0.6; transition: opacity 0.3s ease;
       cursor: default;
     }
-    #corner-logo:hover { opacity: 0.8; }
+    #corner-logo:hover { opacity: 0.9; }
 
     #qr-wrapper {
       background: #ffffff;
@@ -343,7 +343,7 @@
     #about-modal {
       display: none;
       position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(14, 32, 23, 0.85);
+      background: rgba(8, 20, 15, 0.75);
       backdrop-filter: blur(8px);
       align-items: center; justify-content: center;
     }
@@ -351,7 +351,8 @@
     #about-modal.open { display: flex; }
 
     #about-content {
-      background: #1e2d27;
+      background: rgba(22, 40, 32, 0.65);
+      backdrop-filter: blur(20px);
       color: #fff;
       padding: 40px;
       border-radius: 16px;
@@ -412,7 +413,7 @@
       <input type="text" id="text" value="https://thejollylama.github.io/qArt-code/" oninput="updateQR()">
 
       <label style="margin-top: 6px; display: block;">QR Subtext Label (Optional)</label>
-      <input type="text" id="subtextInput" value="Artizen season 7" placeholder="e.g. Artizen season 7" oninput="updateSubtext()">
+      <input type="text" id="subtextInput" value="⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 " placeholder="e.g. ⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 " oninput="updateSubtext()">
 
       <div class="row" style="margin-top: 6px;">
         <div>
@@ -501,7 +502,7 @@
     <div id="preview-container">
       <div id="qr-wrapper">
         <div id="canvas"></div>
-        <div id="qr-subtext">Artizen season 7</div>
+        <div id="qr-subtext">⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 </div>
       </div>
 
       <a href="https://revnet.money/base:6" target="_blank" title="Buy ART Token">
@@ -678,7 +679,6 @@
     }
 
     function closeModal() {
-      document.getElementById("about-modal").classList.remove("close");
       document.getElementById("about-modal").classList.remove("open");
     }
 
@@ -745,7 +745,7 @@
 
     animateParticles();
 
-    /* Header Crawling Swarm Animation (Brightened & Glowing) */
+    /* Full-Height Bright Header Crawling Swarm Animation */
     const headerCanvas = document.getElementById('header-background-canvas');
     const headerCtx = headerCanvas.getContext('2d');
 
@@ -757,21 +757,23 @@
     resizeHeaderCanvas();
     window.addEventListener('resize', resizeHeaderCanvas);
 
-    const numSwarmDots = 48;
+    const numSwarmDots = 54;
     let swarmDots = [];
-    let wormHeadX = -100;
-    const wormSpeed = 0.8;
+    let wormHeadX = -120;
+    const wormSpeed = 0.85;
 
     function initSwarmDots() {
       swarmDots = [];
+      const canvasH = headerCanvas.height || 110;
       for (let i = 0; i < numSwarmDots; i++) {
         swarmDots.push({
-          offsetX: (Math.random() - 0.5) * 140,
-          offsetY: (Math.random() - 0.5) * 60,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
-          radius: Math.random() * 3 + 3,
-          isSquare: Math.random() > 0.4
+          offsetX: (Math.random() - 0.5) * 160,
+          // Expand swarm offsets to utilize the full top-to-bottom height
+          yPos: Math.random() * (canvasH - 16) + 8,
+          vx: (Math.random() - 0.5) * 0.7,
+          vy: (Math.random() - 0.5) * 0.7,
+          radius: Math.random() * 3.5 + 3.5,
+          isSquare: Math.random() > 0.45
         });
       }
     }
@@ -780,24 +782,26 @@
     function animateHeaderSwarm() {
       headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
 
-      const centerY = headerCanvas.height / 2;
+      const canvasH = headerCanvas.height;
 
       wormHeadX += wormSpeed;
-      if (wormHeadX > headerCanvas.width + 120) {
-        wormHeadX = -120;
+      if (wormHeadX > headerCanvas.width + 140) {
+        wormHeadX = -140;
         initSwarmDots();
       }
 
-      const maxDist = 42;
+      const maxDist = 55;
+
+      // Draw connection lines between nearby swarm points
       for (let i = 0; i < swarmDots.length; i++) {
         let d1 = swarmDots[i];
         let absX1 = wormHeadX + d1.offsetX;
-        let absY1 = centerY + d1.offsetY;
+        let absY1 = d1.yPos;
 
         for (let j = i + 1; j < swarmDots.length; j++) {
           let d2 = swarmDots[j];
           let absX2 = wormHeadX + d2.offsetX;
-          let absY2 = centerY + d2.offsetY;
+          let absY2 = d2.yPos;
 
           let dx = absX1 - absX2;
           let dy = absY1 - absY2;
@@ -807,39 +811,40 @@
             headerCtx.beginPath();
             headerCtx.moveTo(absX1, absY1);
             headerCtx.lineTo(absX2, absY2);
-            headerCtx.lineWidth = 2.2;
-            headerCtx.strokeStyle = `rgba(52, 211, 153, ${(1 - dist / maxDist) * 0.95})`;
+            headerCtx.lineWidth = 2.5;
+            headerCtx.strokeStyle = `rgba(0, 255, 200, ${(1 - dist / maxDist) * 0.95})`;
             headerCtx.stroke();
           }
         }
       }
 
-      // Add neon glow to swarm particles
-      headerCtx.shadowColor = '#26e6a3';
-      headerCtx.shadowBlur = 10;
+      // Strong neon glow layer
+      headerCtx.shadowColor = '#00ffc8';
+      headerCtx.shadowBlur = 14;
 
+      // Render dots and squares across the full header height
       for (let i = 0; i < swarmDots.length; i++) {
         let dot = swarmDots[i];
 
         dot.offsetX += dot.vx;
-        dot.offsetY += dot.vy;
+        dot.yPos += dot.vy;
 
-        if (Math.abs(dot.offsetX) > 70) dot.vx *= -1;
-        if (Math.abs(dot.offsetY) > 30) dot.vy *= -1;
+        if (Math.abs(dot.offsetX) > 80) dot.vx *= -1;
+        if (dot.yPos < 8 || dot.yPos > canvasH - 8) dot.vy *= -1;
 
         let posX = wormHeadX + dot.offsetX;
-        let posY = centerY + dot.offsetY;
+        let posY = dot.yPos;
 
-        headerCtx.fillStyle = '#34d399';
+        headerCtx.fillStyle = '#00ffc8';
 
         if (dot.isSquare) {
-          const r = dot.radius * 1.8;
+          const r = dot.radius * 2.0;
           headerCtx.beginPath();
           headerCtx.roundRect(posX - r / 2, posY - r / 2, r, r, 2);
           headerCtx.fill();
         } else {
           headerCtx.beginPath();
-          headerCtx.arc(posX, posY, dot.radius * 1.1, 0, Math.PI * 2);
+          headerCtx.arc(posX, posY, dot.radius * 1.25, 0, Math.PI * 2);
           headerCtx.fill();
         }
       }
