@@ -1,6 +1,6 @@
 # qArt-code 🎨📱
 
-> A fully decentralized, customizable, and client-side QR Code Studio built for **Artizens** and **ArtFi** creators.
+> A fully decentralized, customizable, and client-side QR Code Studio built for **Artizens**.
 
 ![qArt-code Preview](./qArt-code.jpeg)
 
@@ -28,10 +28,4 @@
 
 ## 🚀 Quick Start
 
-### 1. Local Run
-Simply clone the repository and open `index.html` in your browser:
-
-```bash
-git clone [https://github.com/TheJollyLaMa/qArt-code.git](https://github.com/TheJollyLaMa/qArt-code.git)
-cd qArt-code
-open index.html
+https://thejollylama.github.io/qArt-code/
