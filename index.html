@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
 
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
     :root {
@@ -154,6 +153,11 @@
       padding-bottom: 4px;
     }
 
+    .control-sublabel {
+      font-size: 0.75rem; text-transform: lowercase; font-style: italic;
+      color: var(--secondary-glow); opacity: 0.9; margin-top: -8px; margin-bottom: 4px;
+    }
+
     label { font-size: 0.82rem; font-weight: 600; color: #fff; }
 
     input[type="text"], input[type="number"], select {
@@ -236,7 +240,6 @@
     }
 
     button.secondary { background: linear-gradient(to bottom, #546e7a, #37474f); }
-    button.accent { background: linear-gradient(to bottom, #ffca28, #f57f17); color: #000; }
     button:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
 
     .alert {
@@ -461,6 +464,7 @@
       </div>
 
       <h3 class="control-group-title">Text Shimmer Controls</h3>
+      <div class="control-sublabel">(for screen recording)</div>
       <div class="row">
         <div>
           <label style="cursor: pointer;">
@@ -489,6 +493,7 @@
       </div>
 
       <h3 class="control-group-title">Edge Sparkle Orbit Controls</h3>
+      <div class="control-sublabel">(for screen recording)</div>
       <div class="row">
         <div>
           <label style="cursor: pointer;">
@@ -529,7 +534,6 @@
       <div class="btn-group">
         <button onclick="downloadQR('png')">Download PNG</button>
         <button class="secondary" onclick="downloadQR('svg')">Download SVG</button>
-        <button class="accent" id="mp4-btn" onclick="downloadMP4()">Record High Quality MP4 (40s)</button>
       </div>
     </div>
 
@@ -560,7 +564,7 @@
         <li>Paste your project URL or IPFS hash.</li>
         <li>Upload custom center logos or translucent watermark background graphics.</li>
         <li>Apply custom linear or radial gradients across matrix dots and corners.</li>
-        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or high-bitrate animated MP4 video!</li>
+        <li>Enable shimmer and edge sparkles for OS screen recordings, or capture crisp vector outputs as PNG and SVG!</li>
       </ul>
 
       <p><strong>Explore further:</strong></p>
@@ -846,130 +850,6 @@
       link.download = "qArt-code.png";
       link.href = mergedCanvas.toDataURL("image/png");
       link.click();
-    }
-
-    async function downloadMP4() {
-      const btn = document.getElementById("mp4-btn");
-      const originalText = btn.innerText;
-      btn.disabled = true;
-
-      const card = document.getElementById("card-outer");
-      const targetScale = 2;
-      const recWidth = card.clientWidth * targetScale;
-      const recHeight = card.clientHeight * targetScale;
-
-      const recCanvas = document.createElement("canvas");
-      recCanvas.width = recWidth;
-      recCanvas.height = recHeight;
-      const ctx = recCanvas.getContext("2d");
-
-      const targetBitrate = 16_000_000;
-      const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
-        ? 'video/mp4;codecs=avc1'
-        : (MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm');
-
-      const stream = recCanvas.captureStream(30);
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: mimeType,
-        videoBitsPerSecond: targetBitrate
-      });
-
-      const chunks = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        const ext = mimeType.includes("mp4") ? "mp4" : "webm";
-        link.download = `qArt-code-hd-40s.${ext}`;
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-
-        btn.innerText = originalText;
-        btn.disabled = false;
-      };
-
-      mediaRecorder.start();
-
-      const durationSeconds = 40;
-      const fps = 30;
-      const totalFrames = durationSeconds * fps;
-      let currentFrame = 0;
-
-      const subtextVal = document.getElementById("subtextInput").value.trim();
-      const shimmerActive = document.getElementById("shimmerToggle").checked;
-      const c1 = document.getElementById("shimmerColor1").value;
-      const c2 = document.getElementById("shimmerColor2").value;
-      const c3 = document.getElementById("shimmerColor3").value;
-      const speedSec = parseFloat(document.getElementById("shimmerSpeed").value) || 3;
-
-      const subtextEl = document.getElementById("qr-subtext");
-
-      const recordInterval = setInterval(async () => {
-        currentFrame++;
-        const percent = Math.floor((currentFrame / totalFrames) * 100);
-        btn.innerText = `Recording HD... ${percent}% (40s)`;
-
-        if (currentFrame >= totalFrames) {
-          clearInterval(recordInterval);
-          mediaRecorder.stop();
-          if (subtextEl) subtextEl.style.opacity = '1';
-          return;
-        }
-
-        // Hide static text so html2canvas doesn't produce double-rendering
-        if (subtextEl) subtextEl.style.opacity = '0';
-
-        const frameCanvas = await html2canvas(card, {
-          scale: targetScale,
-          backgroundColor: null,
-          logging: false
-        });
-
-        ctx.clearRect(0, 0, recCanvas.width, recCanvas.height);
-        ctx.drawImage(frameCanvas, 0, 0, recCanvas.width, recCanvas.height);
-
-        // Render animated shimmer directly onto recorded canvas frame
-        if (subtextVal) {
-          const currentTime = currentFrame / fps;
-          const progress = (currentTime % speedSec) / speedSec;
-
-          ctx.save();
-          ctx.font = `bold ${16 * targetScale}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "bottom";
-
-          const textX = recCanvas.width / 2;
-          const textY = recCanvas.height - (18 * targetScale);
-
-          if (shimmerActive) {
-            const gradWidth = recCanvas.width;
-            const shift = progress * gradWidth;
-
-            const grad = ctx.createLinearGradient(
-              -gradWidth + shift, 0,
-              gradWidth + shift, 0
-            );
-            grad.addColorStop(0, c1);
-            grad.addColorStop(0.25, c2);
-            grad.addColorStop(0.5, c3);
-            grad.addColorStop(0.75, c2);
-            grad.addColorStop(1, c1);
-
-            ctx.fillStyle = grad;
-          } else {
-            ctx.fillStyle = c1;
-          }
-
-          ctx.fillText(subtextVal, textX, textY);
-          ctx.restore();
-        }
-
-      }, 1000 / fps);
     }
 
     /* Edge Sparkle Orbit System */
