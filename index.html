@@ -11,12 +11,16 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
 
+  <!-- Core QR Styling Library -->
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <!-- Animated GIF Generation Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
   
   <style>
     :root {
       --bg-deep: #0e2017;
-      --bg-panel: rgba(18, 42, 32, 0.22); /* Ultra-transparent panel background */
+      --bg-panel: rgba(18, 42, 32, 0.22);
       --text-main: #e0f2f1;
       --text-muted: #80cbc4;
       --primary-glow: #26a69a;
@@ -123,7 +127,6 @@
       justify-content: space-between;
     }
 
-    /* Header Background Canvas */
     #header-background-canvas {
       position: absolute;
       top: 0;
@@ -204,7 +207,9 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      width: 380px;
+      width: 400px;
+      max-height: 85vh;
+      overflow-y: auto;
       background: var(--bg-panel);
       backdrop-filter: blur(16px);
       padding: 24px;
@@ -214,7 +219,7 @@
     }
 
     h3.control-group-title {
-      margin: 10px 0 0;
+      margin: 12px 0 0;
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -274,7 +279,24 @@
     }
     #corner-logo:hover { opacity: 0.9; }
 
+    /* Outer Wrapper with Sparkle Layering */
+    .qr-card-outer {
+      position: relative;
+      padding: 6px;
+      border-radius: 18px;
+    }
+
+    #sparkle-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
     #qr-wrapper {
+      position: relative;
+      z-index: 1;
       background: #ffffff;
       padding: 16px 16px 12px 16px;
       border-radius: 12px;
@@ -295,13 +317,17 @@
       justify-content: center;
       max-width: 100%;
       overflow: hidden;
+      position: relative;
     }
 
     #canvas canvas {
       max-width: 100% !important;
       height: auto !important;
+      position: relative;
+      z-index: 1;
     }
 
+    /* Subtext Styling & Animated Shimmer */
     #qr-subtext {
       margin-top: 8px;
       font-size: 1rem;
@@ -313,9 +339,22 @@
       word-break: break-word;
     }
 
-    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    #qr-subtext.shimmer-active {
+      background: linear-gradient(90deg, #111111 0%, #26a69a 25%, #ffca28 50%, #26a69a 75%, #111111 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textShimmer 3s linear infinite;
+    }
+
+    @keyframes textShimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
     button {
-      flex: 1;
+      flex: 1 1 45%;
       padding: 12px;
       background: linear-gradient(to bottom, #4db6ac, #009688);
       color: white;
@@ -327,6 +366,7 @@
     }
 
     button.secondary { background: linear-gradient(to bottom, #546e7a, #37474f); }
+    button.accent { background: linear-gradient(to bottom, #ffca28, #f57f17); color: #000; }
 
     button:hover {
       transform: translateY(-2px);
@@ -381,59 +421,19 @@
     #about-content a { color: var(--primary-glow); font-weight: bold; text-decoration: none; }
     #about-content a:hover { color: #fff; text-shadow: 0 0 5px var(--primary-glow); }
 
-    /* Mobile Vertical Responsive Layout */
+    /* Mobile Layout */
     @media (max-width: 768px) {
-      header {
-        height: auto;
-        padding: 12px 0;
-      }
-
-      .header-content {
-        padding: 0 15px;
-      }
-
-      .ipfs-logo {
-        height: 32px;
-      }
-
-      #main-title {
-        font-size: 2.6rem;
-      }
-
-      .title-subtitle {
-        font-size: 0.7rem;
-      }
-
-      .header-spacer {
-        width: 32px;
-      }
-
-      main {
-        flex-direction: column-reverse; /* Preview on top, controls stacked below */
-        padding: 16px;
-        gap: 20px;
-      }
-
-      .controls {
-        width: 100%;
-        max-height: none;
-        padding: 16px;
-      }
-
-      #preview-container {
-        width: 100%;
-        padding: 24px 16px 60px 16px;
-        min-height: auto;
-      }
-
-      #qr-wrapper {
-        width: 100%;
-        max-width: 320px;
-      }
-
-      .btn-group {
-        flex-direction: column;
-      }
+      header { height: auto; padding: 12px 0; }
+      .header-content { padding: 0 15px; }
+      .ipfs-logo { height: 32px; }
+      #main-title { font-size: 2.6rem; }
+      .title-subtitle { font-size: 0.7rem; }
+      .header-spacer { width: 32px; }
+      main { flex-direction: column-reverse; padding: 16px; gap: 20px; }
+      .controls { width: 100%; max-height: none; padding: 16px; }
+      #preview-container { width: 100%; padding: 24px 16px 60px 16px; min-height: auto; }
+      #qr-wrapper { width: 100%; max-width: 320px; }
+      .btn-group { flex-direction: column; }
     }
   </style>
 </head>
@@ -482,8 +482,22 @@
           <input type="number" id="size" value="300" oninput="updateQR()">
         </div>
         <div>
-          <label>Background</label>
+          <label>Background Color</label>
           <input type="color" id="bgColor" value="#ffffff" onchange="updateQR()">
+        </div>
+      </div>
+
+      <h3 class="control-group-title">Translucent Canvas Watermark</h3>
+      <label>Upload Watermark Image</label>
+      <input type="file" id="bgFileInput" accept="image/*" style="margin-bottom: 6px;">
+      
+      <label>Or Watermark Image URL</label>
+      <input type="text" id="bgImageUrl" placeholder="./qArt_code_background.jpeg" oninput="updateQR()">
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Watermark Opacity</label>
+          <input type="number" id="bgOpacity" value="0.25" step="0.05" min="0" max="1" oninput="updateQR()">
         </div>
       </div>
 
@@ -494,7 +508,7 @@
       <label>Or Image URL / IPFS Gateway</label>
       <input type="text" id="imageUrl" value="./Artizen_Logo.png" oninput="updateQR()">
 
-      <div class="row">
+      <div class="row" style="margin-top: 6px;">
         <div>
           <label>Logo Ratio (Max 0.3)</label>
           <input type="number" id="imageSize" value="0.25" step="0.05" min="0.1" max="0.3" oninput="updateQR()">
@@ -505,7 +519,7 @@
         </div>
       </div>
 
-      <h3 class="control-group-title">Body Pattern</h3>
+      <h3 class="control-group-title">Body Pattern & Gradients</h3>
       <div class="row">
         <div>
           <label>Dot Style</label>
@@ -518,15 +532,34 @@
           </select>
         </div>
         <div>
-          <label>Dot Color</label>
-          <input type="color" id="dotColor" value="#111111" onchange="updateQR()">
+          <label>Gradient Type</label>
+          <select id="dotGradientType" onchange="updateQR()">
+            <option value="none">Solid Color</option>
+            <option value="linear" selected>Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Color 1</label>
+          <input type="color" id="dotColor1" value="#111111" onchange="updateQR()">
+        </div>
+        <div>
+          <label>Color 2</label>
+          <input type="color" id="dotColor2" value="#26a69a" onchange="updateQR()">
+        </div>
+        <div>
+          <label>Rotation (°)</label>
+          <input type="number" id="dotGradientRotation" value="45" step="15" oninput="updateQR()">
         </div>
       </div>
 
       <h3 class="control-group-title">Corner Frame (Outer Squares)</h3>
       <div class="row">
         <div>
-          <label>Corner Frame Style</label>
+          <label>Frame Style</label>
           <select id="cornerSquareStyle" onchange="updateQR()">
             <option value="extra-rounded" selected>Extra Rounded</option>
             <option value="dot">Dot</option>
@@ -534,8 +567,23 @@
           </select>
         </div>
         <div>
-          <label>Frame Color</label>
-          <input type="color" id="cornerSquareColor" value="#111111" onchange="updateQR()">
+          <label>Frame Gradient</label>
+          <select id="cornerSquareGradientType" onchange="updateQR()">
+            <option value="none" selected>Solid Color</option>
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Frame Color 1</label>
+          <input type="color" id="cornerSquareColor1" value="#111111" onchange="updateQR()">
+        </div>
+        <div>
+          <label>Frame Color 2</label>
+          <input type="color" id="cornerSquareColor2" value="#26a69a" onchange="updateQR()">
         </div>
       </div>
 
@@ -549,21 +597,56 @@
           </select>
         </div>
         <div>
-          <label>Eye Color</label>
-          <input type="color" id="cornerEyeColor" value="#26a69a" onchange="updateQR()">
+          <label>Eye Gradient</label>
+          <select id="cornerEyeGradientType" onchange="updateQR()">
+            <option value="none" selected>Solid Color</option>
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label>Eye Color 1</label>
+          <input type="color" id="cornerEyeColor1" value="#26a69a" onchange="updateQR()">
+        </div>
+        <div>
+          <label>Eye Color 2</label>
+          <input type="color" id="cornerEyeColor2" value="#ffca28" onchange="updateQR()">
+        </div>
+      </div>
+
+      <h3 class="control-group-title">Animations & Effects</h3>
+      <div class="row">
+        <div>
+          <label style="cursor: pointer;">
+            <input type="checkbox" id="shimmerToggle" onchange="toggleShimmer()" checked> Text Shimmer Effect
+          </label>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 6px;">
+        <div>
+          <label style="cursor: pointer;">
+            <input type="checkbox" id="sparkleToggle" onchange="toggleSparkles()" checked> Edge Sparkle Orbit
+          </label>
         </div>
       </div>
 
       <div class="btn-group">
         <button onclick="downloadQR('png')">Download PNG</button>
         <button class="secondary" onclick="downloadQR('svg')">Download SVG</button>
+        <button class="accent" id="gif-btn" onclick="downloadGIF()">Record GIF</button>
       </div>
     </div>
 
     <div id="preview-container">
-      <div id="qr-wrapper">
-        <div id="canvas"></div>
-        <div id="qr-subtext">⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 </div>
+      <div class="qr-card-outer" id="card-outer">
+        <canvas id="sparkle-canvas"></canvas>
+        <div id="qr-wrapper">
+          <div id="canvas"></div>
+          <div id="qr-subtext" class="shimmer-active">⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 </div>
+        </div>
       </div>
 
       <a href="https://revnet.money/base:6" target="_blank" title="Buy ART Token">
@@ -582,9 +665,9 @@
       <p><strong>What to do:</strong></p>
       <ul>
         <li>Paste your project URL or IPFS hash.</li>
-        <li>Upload your own creative logo for the center overlay.</li>
-        <li>Customize colors, shapes, and styles until it pops.</li>
-        <li>Download as PNG for web or SVG for print.</li>
+        <li>Upload custom center logos or translucent watermark background graphics.</li>
+        <li>Apply custom linear or radial gradients across matrix dots and corners.</li>
+        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or animated GIF!</li>
       </ul>
 
       <p><strong>Explore further:</strong></p>
@@ -598,6 +681,7 @@
 
   <script>
     let uploadedBase64Image = null;
+    let uploadedWatermarkImage = null;
 
     const qrCode = new QRCodeStyling({
       width: 300,
@@ -620,6 +704,7 @@
       qrCode.append(container);
       updateQR();
       updateSubtext();
+      initSparkles();
     });
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -635,6 +720,19 @@
       }
     });
 
+    document.getElementById('bgFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedWatermarkImage = event.target.result;
+          document.getElementById('bgImageUrl').value = '';
+          updateQR();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     function updateSubtext() {
       const val = document.getElementById("subtextInput").value;
       const subtextEl = document.getElementById("qr-subtext");
@@ -642,7 +740,19 @@
       subtextEl.style.display = val.trim() ? "block" : "none";
     }
 
+    function toggleShimmer() {
+      const active = document.getElementById("shimmerToggle").checked;
+      const subtextEl = document.getElementById("qr-subtext");
+      if (active) {
+        subtextEl.classList.add("shimmer-active");
+      } else {
+        subtextEl.classList.remove("shimmer-active");
+        subtextEl.style.color = document.getElementById("dotColor1").value;
+      }
+    }
+
     function getLuminance(hex) {
+      if(!hex || !hex.startsWith('#')) return 255;
       const rgb = parseInt(hex.slice(1), 16);
       const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -650,11 +760,32 @@
 
     function checkContrastAndLength(text) {
       const bgLum = getLuminance(document.getElementById("bgColor").value);
-      const dotLum = getLuminance(document.getElementById("dotColor").value);
+      const dotLum = getLuminance(document.getElementById("dotColor1").value);
       const diff = Math.abs(bgLum - dotLum);
       
       document.getElementById("contrast-warning").style.display = diff < 80 ? "block" : "none";
       document.getElementById("length-info").style.display = text.length > 120 ? "block" : "none";
+    }
+
+    function buildGradientOption(typeId, color1Id, color2Id, rotationId) {
+      const type = document.getElementById(typeId).value;
+      const c1 = document.getElementById(color1Id).value;
+      const c2 = document.getElementById(color2Id).value;
+      const rotation = rotationId ? (parseFloat(document.getElementById(rotationId).value) || 0) * (Math.PI / 180) : 0;
+
+      if (type === 'none') {
+        return { color: c1, gradient: null };
+      }
+      return {
+        gradient: {
+          type: type,
+          rotation: rotation,
+          colorStops: [
+            { offset: 0, color: c1 },
+            { offset: 1, color: c2 }
+          ]
+        }
+      };
     }
 
     function updateQR() {
@@ -665,37 +796,62 @@
       const imageUrlInput = document.getElementById("imageUrl").value;
       const activeImage = uploadedBase64Image || imageUrlInput;
 
-      const dotColor = document.getElementById("dotColor").value;
       const bgColor = document.getElementById("bgColor").value;
-      document.getElementById("qr-subtext").style.color = dotColor;
+      const subtextEl = document.getElementById("qr-subtext");
+      if (!document.getElementById("shimmerToggle").checked) {
+        subtextEl.style.color = document.getElementById("dotColor1").value;
+      }
       document.getElementById("qr-wrapper").style.backgroundColor = bgColor;
+
+      const dotsOpt = buildGradientOption("dotGradientType", "dotColor1", "dotColor2", "dotGradientRotation");
+      dotsOpt.type = document.getElementById("dotsStyle").value;
+
+      const cornerSqOpt = buildGradientOption("cornerSquareGradientType", "cornerSquareColor1", "cornerSquareColor2");
+      cornerSqOpt.type = document.getElementById("cornerSquareStyle").value;
+
+      const cornerEyeOpt = buildGradientOption("cornerEyeGradientType", "cornerEyeColor1", "cornerEyeColor2");
+      cornerEyeOpt.type = document.getElementById("cornerEyeStyle").value;
 
       qrCode.update({
         width: size,
         height: size,
         data: textValue,
         image: activeImage,
-        dotsOptions: {
-          color: dotColor,
-          type: document.getElementById("dotsStyle").value
-        },
-        backgroundOptions: {
-          color: bgColor
-        },
+        dotsOptions: dotsOpt,
+        backgroundOptions: { color: bgColor },
         imageOptions: {
           imageSize: Math.min(parseFloat(document.getElementById("imageSize").value) || 0.25, 0.3),
           margin: parseInt(document.getElementById("imageMargin").value) || 4,
           hideBackgroundDots: true
         },
-        cornersSquareOptions: {
-          color: document.getElementById("cornerSquareColor").value,
-          type: document.getElementById("cornerSquareStyle").value
-        },
-        cornersDotOptions: {
-          color: document.getElementById("cornerEyeColor").value,
-          type: document.getElementById("cornerEyeStyle").value
-        }
+        cornersSquareOptions: cornerSqOpt,
+        cornersDotOptions: cornerEyeOpt
       });
+
+      // Render Translucent Watermark Overlay on top of background
+      setTimeout(applyWatermarkToCanvas, 100);
+    }
+
+    function applyWatermarkToCanvas() {
+      const bgImgSrc = uploadedWatermarkImage || document.getElementById("bgImageUrl").value;
+      const opacity = parseFloat(document.getElementById("bgOpacity").value) || 0;
+      const qrCanvas = document.querySelector("#canvas canvas");
+
+      if (!qrCanvas) return;
+
+      if (bgImgSrc && opacity > 0) {
+        const ctx = qrCanvas.getContext("2d");
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = bgImgSrc;
+        img.onload = () => {
+          ctx.save();
+          ctx.globalCompositeOperation = "destination-over";
+          ctx.globalAlpha = opacity;
+          ctx.drawImage(img, 0, 0, qrCanvas.width, qrCanvas.height);
+          ctx.restore();
+        };
+      }
     }
 
     async function downloadQR(ext) {
@@ -724,7 +880,7 @@
 
       ctx.drawImage(rawCanvas, padding, padding);
 
-      ctx.fillStyle = document.getElementById("dotColor").value;
+      ctx.fillStyle = document.getElementById("dotColor1").value;
       ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(subtext, mergedCanvas.width / 2, rawCanvas.height + padding + 24);
@@ -733,6 +889,117 @@
       link.download = "qArt-code.png";
       link.href = mergedCanvas.toDataURL("image/png");
       link.click();
+    }
+
+    /* Animated GIF Capture */
+    async function downloadGIF() {
+      const btn = document.getElementById("gif-btn");
+      const originalText = btn.innerText;
+      btn.innerText = "Recording...";
+      btn.disabled = true;
+
+      const card = document.getElementById("card-outer");
+      const frames = [];
+      const totalFrames = 12;
+
+      for (let i = 0; i < totalFrames; i++) {
+        const frameCanvas = await html2canvas(card, { backgroundColor: null, logging: false });
+        frames.push(frameCanvas.toDataURL('image/png'));
+        await new Promise(r => setTimeout(r, 100));
+      }
+
+      btn.innerText = "Encoding...";
+
+      gifshot.createGIF({
+        images: frames,
+        interval: 0.1,
+        gifWidth: card.clientWidth,
+        gifHeight: card.clientHeight
+      }, function (obj) {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        if (!obj.error) {
+          const animatedImage = obj.image;
+          const link = document.createElement('a');
+          link.download = 'qArt-code-animated.gif';
+          link.href = animatedImage;
+          link.click();
+        } else {
+          alert("GIF generation failed. Please try again.");
+        }
+      });
+    }
+
+    /* Edge Sparkle Orbit System */
+    let sparkleAnimationId = null;
+    let sparklesActive = true;
+
+    function toggleSparkles() {
+      sparklesActive = document.getElementById("sparkleToggle").checked;
+      const sparkleCanvas = document.getElementById("sparkle-canvas");
+      sparkleCanvas.style.display = sparklesActive ? "block" : "none";
+    }
+
+    function initSparkles() {
+      const sCanvas = document.getElementById("sparkle-canvas");
+      const sCtx = sCanvas.getContext("2d");
+      const outerCard = document.getElementById("card-outer");
+
+      function syncSize() {
+        sCanvas.width = outerCard.clientWidth;
+        sCanvas.height = outerCard.clientHeight;
+      }
+      syncSize();
+      window.addEventListener('resize', syncSize);
+
+      const numSparkles = 18;
+      const sparkles = Array.from({ length: numSparkles }, () => ({
+        progress: Math.random(),
+        speed: 0.003 + Math.random() * 0.005,
+        size: Math.random() * 3 + 2,
+        hue: Math.random() * 60 + 160
+      }));
+
+      function drawSparkles() {
+        sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
+        if (!sparklesActive) {
+          requestAnimationFrame(drawSparkles);
+          return;
+        }
+
+        const w = sCanvas.width;
+        const h = sCanvas.height;
+        const perimeter = 2 * (w + h);
+
+        sparkles.forEach(s => {
+          s.progress = (s.progress + s.speed) % 1;
+          let dist = s.progress * perimeter;
+          let x = 0, y = 0;
+
+          if (dist < w) {
+            x = dist; y = 0;
+          } else if (dist < w + h) {
+            x = w; y = dist - w;
+          } else if (dist < 2 * w + h) {
+            x = w - (dist - (w + h)); y = h;
+          } else {
+            x = 0; y = h - (dist - (2 * w + h));
+          }
+
+          sCtx.save();
+          sCtx.beginPath();
+          sCtx.arc(x, y, s.size, 0, Math.PI * 2);
+          sCtx.fillStyle = `hsl(${s.hue}, 90%, 65%)`;
+          sCtx.shadowColor = `hsl(${s.hue}, 100%, 75%)`;
+          sCtx.shadowBlur = 10;
+          sCtx.fill();
+          sCtx.restore();
+        });
+
+        requestAnimationFrame(drawSparkles);
+      }
+
+      drawSparkles();
     }
 
     function openModal() {
@@ -806,7 +1073,7 @@
 
     animateParticles();
 
-    /* Full-Height Bright Header Crawling Swarm Animation */
+    /* Header Crawling Swarm Animation */
     const headerCanvas = document.getElementById('header-background-canvas');
     const headerCtx = headerCanvas.getContext('2d');
 
