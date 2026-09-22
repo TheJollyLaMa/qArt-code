@@ -317,7 +317,7 @@
       <input type="text" id="text" value="https://thejollylama.github.io/qArt-code/" oninput="updateQR()">
 
       <label style="margin-top: 6px; display: block;">QR Subtext Label (Optional)</label>
-      <input type="text" id="subtextInput" value="⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 " placeholder="e.g. ⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 " oninput="updateSubtext()">
+      <input type="text" id="subtextInput" value="⏅ 🧞‍♂️ qArt-Code ⚸ 🕳️🐇 " oninput="updateSubtext()">
 
       <div class="row" style="margin-top: 6px;">
         <div>
@@ -335,12 +335,12 @@
       <input type="file" id="bgFileInput" accept="image/*" style="margin-bottom: 6px;">
       
       <label>Or Watermark Image URL</label>
-      <input type="text" id="bgImageUrl" value="./Artizen_Logo.png" placeholder="./Artizen_Logo.png" oninput="updateQR()">
+      <input type="text" id="bgImageUrl" value="./Artizen_Logo.png" placeholder="./Artizen_Logo.png">
 
       <div class="row" style="margin-top: 6px;">
         <div>
           <label>Watermark Opacity (0 to 1)</label>
-          <input type="number" id="bgOpacity" value="0.25" step="0.05" min="0" max="1" oninput="updateQR()">
+          <input type="number" id="bgOpacity" value="0.25" step="0.05" min="0" max="1" oninput="applyWatermarkToCanvas()">
         </div>
       </div>
 
@@ -575,6 +575,8 @@
   <script>
     let uploadedBase64Image = null;
     let uploadedWatermarkImage = null;
+    let watermarkImg = new Image();
+    watermarkImg.crossOrigin = "anonymous";
 
     const qrCode = new QRCodeStyling({
       width: 300,
@@ -612,10 +614,29 @@
       qrOptions: { errorCorrectionLevel: 'H' }
     });
 
+    function loadWatermarkImage(src) {
+      if (!src) {
+        watermarkImg = null;
+        applyWatermarkToCanvas();
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        watermarkImg = img;
+        applyWatermarkToCanvas();
+      };
+      img.onerror = () => {
+        watermarkImg = null;
+      };
+      img.src = src;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById("canvas");
       container.innerHTML = "";
       qrCode.append(container);
+      loadWatermarkImage(document.getElementById("bgImageUrl").value);
       updateQR();
       updateSubtext();
       updateShimmerSettings();
@@ -642,10 +663,15 @@
         reader.onload = (event) => {
           uploadedWatermarkImage = event.target.result;
           document.getElementById('bgImageUrl').value = '';
-          updateQR();
+          loadWatermarkImage(uploadedWatermarkImage);
         };
         reader.readAsDataURL(file);
       }
+    });
+
+    document.getElementById('bgImageUrl').addEventListener('input', (e) => {
+      uploadedWatermarkImage = null;
+      loadWatermarkImage(e.target.value);
     });
 
     function updateSubtext() {
@@ -755,38 +781,34 @@
         cornersDotOptions: cornerEyeOpt
       });
 
-      setTimeout(applyWatermarkToCanvas, 150);
+      requestAnimationFrame(() => {
+        applyWatermarkToCanvas();
+      });
     }
 
     function applyWatermarkToCanvas() {
-      const bgImgSrc = uploadedWatermarkImage || document.getElementById("bgImageUrl").value;
       const opacity = parseFloat(document.getElementById("bgOpacity").value);
       const qrCanvas = document.querySelector("#canvas canvas");
 
-      if (!qrCanvas || isNaN(opacity) || opacity <= 0) return;
+      if (!qrCanvas || !watermarkImg || isNaN(opacity) || opacity <= 0) return;
 
       const ctx = qrCanvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = bgImgSrc;
-      img.onload = () => {
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = qrCanvas.width;
-        tempCanvas.height = qrCanvas.height;
-        const tempCtx = tempCanvas.getContext("2d");
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = qrCanvas.width;
+      tempCanvas.height = qrCanvas.height;
+      const tempCtx = tempCanvas.getContext("2d");
 
-        tempCtx.fillStyle = document.getElementById("bgColor").value;
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.fillStyle = document.getElementById("bgColor").value;
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-        tempCtx.globalAlpha = opacity;
-        tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.globalAlpha = opacity;
+      tempCtx.drawImage(watermarkImg, 0, 0, tempCanvas.width, tempCanvas.height);
 
-        tempCtx.globalAlpha = 1.0;
-        tempCtx.drawImage(qrCanvas, 0, 0);
+      tempCtx.globalAlpha = 1.0;
+      tempCtx.drawImage(qrCanvas, 0, 0);
 
-        ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
-        ctx.drawImage(tempCanvas, 0, 0);
-      };
+      ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+      ctx.drawImage(tempCanvas, 0, 0);
     }
 
     async function downloadQR(ext) {
@@ -832,7 +854,7 @@
       btn.disabled = true;
 
       const card = document.getElementById("card-outer");
-      const targetScale = 2; // Upscale 2x for sharp 1080p+ high resolution
+      const targetScale = 2;
       const recWidth = card.clientWidth * targetScale;
       const recHeight = card.clientHeight * targetScale;
 
@@ -841,7 +863,6 @@
       recCanvas.height = recHeight;
       const ctx = recCanvas.getContext("2d");
 
-      // High bitrate targeted for ~80MB across 40 seconds (~16 Mbps)
       const targetBitrate = 16_000_000;
       const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
         ? 'video/mp4;codecs=avc1'
@@ -879,6 +900,15 @@
       const totalFrames = durationSeconds * fps;
       let currentFrame = 0;
 
+      const subtextVal = document.getElementById("subtextInput").value.trim();
+      const shimmerActive = document.getElementById("shimmerToggle").checked;
+      const c1 = document.getElementById("shimmerColor1").value;
+      const c2 = document.getElementById("shimmerColor2").value;
+      const c3 = document.getElementById("shimmerColor3").value;
+      const speedSec = parseFloat(document.getElementById("shimmerSpeed").value) || 3;
+
+      const subtextEl = document.getElementById("qr-subtext");
+
       const recordInterval = setInterval(async () => {
         currentFrame++;
         const percent = Math.floor((currentFrame / totalFrames) * 100);
@@ -887,8 +917,12 @@
         if (currentFrame >= totalFrames) {
           clearInterval(recordInterval);
           mediaRecorder.stop();
+          if (subtextEl) subtextEl.style.opacity = '1';
           return;
         }
+
+        // Hide static text so html2canvas doesn't produce double-rendering
+        if (subtextEl) subtextEl.style.opacity = '0';
 
         const frameCanvas = await html2canvas(card, {
           scale: targetScale,
@@ -898,6 +932,43 @@
 
         ctx.clearRect(0, 0, recCanvas.width, recCanvas.height);
         ctx.drawImage(frameCanvas, 0, 0, recCanvas.width, recCanvas.height);
+
+        // Render animated shimmer directly onto recorded canvas frame
+        if (subtextVal) {
+          const currentTime = currentFrame / fps;
+          const progress = (currentTime % speedSec) / speedSec;
+
+          ctx.save();
+          ctx.font = `bold ${16 * targetScale}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+
+          const textX = recCanvas.width / 2;
+          const textY = recCanvas.height - (18 * targetScale);
+
+          if (shimmerActive) {
+            const gradWidth = recCanvas.width;
+            const shift = progress * gradWidth;
+
+            const grad = ctx.createLinearGradient(
+              -gradWidth + shift, 0,
+              gradWidth + shift, 0
+            );
+            grad.addColorStop(0, c1);
+            grad.addColorStop(0.25, c2);
+            grad.addColorStop(0.5, c3);
+            grad.addColorStop(0.75, c2);
+            grad.addColorStop(1, c1);
+
+            ctx.fillStyle = grad;
+          } else {
+            ctx.fillStyle = c1;
+          }
+
+          ctx.fillText(subtextVal, textX, textY);
+          ctx.restore();
+        }
+
       }, 1000 / fps);
     }
 
