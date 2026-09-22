@@ -1,6 +1,6 @@
 # 𐃉⚸👁️♀︎👁️☿𐃉 qArt-code
 
-> A customized, client-side QR Code Studio built specifically for **Artizens** to elevate, brand, and promote their projects with ease.
+> Another way for **Artizens** to promote their projects, funds, and the platform.
 
 ![qArt-code Banner](./qArt-code.jpeg)
 
