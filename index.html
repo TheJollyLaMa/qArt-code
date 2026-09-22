@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>qArt-Code 🎨📱</title>
+  <title>qArt-Code</title>
   
   <!-- Umbrella QR Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a3c2c'/><path d='M20 45 C20 25, 80 25, 80 45 Z' fill='%2326a69a'/><path d='M50 45 L50 75 C50 80, 40 80, 40 75' stroke='%23e0f2f1' stroke-width='6' fill='none' stroke-linecap='round'/><rect x='30' y='25' width='10' height='10' fill='%23ffca28'/><rect x='60' y='25' width='10' height='10' fill='%23ffca28'/></svg>">
+  <link rel="icon" href="./favicon.png">
   
-  <!-- Google Retro Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Google Smooth Cursive Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@700&family=Great+Vibes&display=swap" rel="stylesheet">
 
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   
   <style>
     :root {
       --bg-deep: #0e2017;
-      --bg-panel: rgba(26, 60, 44, 0.65); /* Made transparent to reveal background */
+      --bg-panel: rgba(26, 60, 44, 0.45); /* Increased transparency for panels */
       --text-main: #e0f2f1;
       --text-muted: #80cbc4;
       --primary-glow: #26a69a;
       --secondary-glow: #ffca28;
-      --border-soft: rgba(63, 110, 89, 0.6);
+      --border-soft: rgba(63, 110, 89, 0.4); /* Border transparency increased to blend better */
     }
 
     * { box-sizing: border-box; }
@@ -124,6 +124,17 @@
       justify-content: space-between;
     }
 
+    /* Animated sporadic floating QR element */
+    #header-floating-qr {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 5; /* Above banner, below content */
+      width: 100px;
+      height: 100px;
+    }
+
     .ipfs-logo {
       height: 42px;
       width: auto;
@@ -137,9 +148,8 @@
     }
 
     #main-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 1.8rem;
-      letter-spacing: -1px;
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.6rem; /* Adjust size for cursive font */
       cursor: pointer;
       text-align: center;
       color: var(--primary-glow);
@@ -151,7 +161,7 @@
     }
 
     #main-title:hover {
-      transform: scale(1.05);
+      transform: scale(1.03);
       color: #ffffff;
       text-shadow: 
         0 0 8px var(--secondary-glow),
@@ -296,7 +306,7 @@
     #about-modal {
       display: none;
       position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(14,32,23,0.85);
+      background: rgba(14, 32, 23, 0.85);
       backdrop-filter: blur(8px);
       align-items: center; justify-content: center;
     }
@@ -337,6 +347,9 @@
     <div class="banner-layer banner-1"></div>
     <div class="banner-layer banner-2"></div>
     <div class="header-overlay"></div>
+
+    <!--Sporadic floating animated qrcode inside header-->
+    <canvas id="header-floating-qr"></canvas>
 
     <div class="header-content">
       <img src="./IPFS_Logo.png" alt="IPFS Logo" class="ipfs-logo">
@@ -450,9 +463,9 @@
   <div id="about-modal">
     <div id="about-content">
       <span id="close-modal" onclick="closeModal()">&times;</span>
-      <h2>About qArt-Code 🎨📱</h2>
-      <p>qArt-Code is a fully decentralized, custom QR studio designed for creators in the Artizen ecosystem.</p>
-      <p>This is where art and utility intersect—giving your links glimmer, shine, and personality for physical art, digital grants, or repository funds on IPFS.</p>
+      <h2>About qArt-Code</h2>
+      <p>qArt-Code is a custom QR studio designed for creators in the Artizen ecosystem.</p>
+      <p>A decent place where art and utility intersect.</p>
       
       <p><strong>What to do:</strong></p>
       <ul>
@@ -465,8 +478,8 @@
       <p><strong>Explore further:</strong></p>
       <p>🔗 <a href="https://github.com/TheJollyLaMa/qArt-code" target="_blank">View the Project Repo</a></p>
       
-      <p style="font-size: 0.9em; border-top: 1px solid var(--border-soft); padding-top: 15px;">
-        Head nod to <strong>TheJollyLaMa.eth</strong>. Feel free to buy him a hot cup of coffee or tea at that address!
+      <p style="font-family: 'Great Vibes', cursive; font-size: 0.9em; border-top: 1px solid var(--border-soft); padding-top: 15px;">
+        <strong >TheJollyLaMa.eth</strong>
       </p>
     </div>
   </div>
@@ -480,7 +493,7 @@
       margin: 10,
       type: "canvas",
       data: "https://thejollylama.github.io/qArt-code/",
-      image: "./Ens_Eth_Breathe.gif",
+      image: "https://bafybeibwhoqzf6nxsh5ctqx5o4uezwhnqncm3uztaimzuvcfljfcjwknqi.ipfs.inbrowser.link/Artizen_Logo.png", /* Use correct image for artizen in center by default */
       dotsOptions: { color: "#111111", type: "extra-rounded" },
       backgroundOptions: { color: "#ffffff" },
       imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
@@ -494,7 +507,7 @@
       const container = document.getElementById("canvas");
       container.innerHTML = "";
       qrCode.append(container);
-      updateQR();
+      updateQR(); // Loads QR on landing
     });
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -635,6 +648,48 @@
     }
 
     animateParticles();
+
+    /* Header sporadic floating QR animation */
+    const floatingQrCanvas = document.getElementById('header-floating-qr');
+    const floatingQrCtx = floatingQrCanvas.getContext('2d');
+    
+    // Position qrcode image data uri here (just use dummy or real base64 if available)
+    const qrImage = new Image();
+    qrImage.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><rect x="10" y="10" width="20" height="20" fill="black"/><rect x="70" y="10" width="20" height="20" fill="black"/><rect x="10" y="70" width="20" height="20" fill="black"/><rect x="40" y="40" width="20" height="20" fill="black"/><rect x="70" y="70" width="10" height="10" fill="black"/><rect x="80" y="80" width="10" height="10" fill="black"/></svg>';
+    
+    const qrSize = 100;
+    
+    function moveQr() {
+        const header = document.querySelector('header');
+        const headerRect = header.getBoundingClientRect();
+        
+        // Random placement within header bounds
+        const x = Math.random() * (headerRect.width - qrSize);
+        const y = Math.random() * (headerRect.height - qrSize);
+        
+        floatingQrCanvas.width = headerRect.width;
+        floatingQrCanvas.height = headerRect.height;
+        
+        floatingQrCtx.clearRect(0,0, floatingQrCanvas.width, floatingQrCanvas.height);
+        
+        floatingQrCtx.drawImage(qrImage, x, y, qrSize, qrSize);
+        
+        // Use dots/connections style elements on floating qr for blending
+        floatingQrCtx.beginPath();
+        floatingQrCtx.fillStyle = '#26a69a';
+        floatingQrCtx.arc(x + qrSize / 2, y + qrSize / 2, 5, 0, Math.PI * 2);
+        floatingQrCtx.fill();
+        
+        floatingQrCtx.beginPath();
+        floatingQrCtx.strokeStyle = 'rgba(38, 166, 154, 0.5)';
+        floatingQrCtx.moveTo(x + qrSize / 2, y + qrSize / 2);
+        floatingQrCtx.lineTo(headerRect.width / 2, headerRect.height / 2); // Connect sporadically to center title or logo...
+        floatingQrCtx.stroke();
+        
+        setTimeout(moveQr, Math.random() * 3000 + 1000); // sporadic timing
+    }
+    qrImage.onload = moveQr;
+
   </script>
 </body>
 </html>
