@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom QR Code Studio</title>
+  <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      gap: 30px;
+      padding: 30px;
+      background: #1e1e24;
+      color: #e0e0e0;
+      margin: 0;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 380px;
+      background: #2b2b36;
+      padding: 24px;
+      border-radius: 12px;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    h2 { margin: 0 0 10px 0; font-size: 1.3rem; color: #fff; }
+    .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-top: 10px; border-bottom: 1px solid #3f3f4e; padding-bottom: 4px; }
+    label { font-size: 0.85rem; font-weight: 600; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 8px 10px;
+      background: #1e1e24;
+      border: 1px solid #3f3f4e;
+      border-radius: 6px;
+      color: #fff;
+    }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .row > div { flex: 1; }
+    input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: none;
+      border-radius: 6px;
+      background: none;
+      cursor: pointer;
+    }
+    #preview-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #2b2b36;
+      border-radius: 12px;
+      padding: 40px;
+    }
+    #canvas {
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button {
+      flex: 1;
+      padding: 10px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.secondary { background: #3f3f4e; }
+    button:hover { opacity: 0.9; }
+    .alert {
+      display: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+    #contrast-warning { background: #ef444422; border: 1px solid #ef4444; color: #fca5a5; }
+    #length-info { background: #3b82f622; border: 1px solid #3b82f6; color: #93c5fd; }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <h2>QR Studio</h2>
+
+    <div id="contrast-warning" class="alert">⚠️ Low contrast detected! Scanners may have trouble reading this code.</div>
+    <div id="length-info" class="alert">ℹ️ Long link detected. The QR matrix will be dense—ensure canvas contrast stays high.</div>
+
+    <div class="section-title">Data & Canvas</div>
+    <label>URL / Content</label>
+    <input type="text" id="text" value="https://artizen.fund" oninput="updateQR()">
+
+    <div class="row">
+      <div>
+        <label>Size (px)</label>
+        <input type="number" id="size" value="300" oninput="updateQR()">
+      </div>
+      <div>
+        <label>Background</label>
+        <input type="color" id="bgColor" value="#ffffff" onchange="updateQR()">
+      </div>
+    </div>
+
+    <div class="section-title">Center Logo</div>
+    <label>Upload Image File (Bypasses CORS)</label>
+    <input type="file" id="fileInput" accept="image/*" style="margin-bottom: 6px;">
+    
+    <label>Or Image URL / IPFS Gateway</label>
+    <input type="text" id="imageUrl" value="https://bafybeifvsia523vhfwrdxcp3fgvb22slost57i5ljychmhuhowrcblbmya.ipfs.inbrowser.link/Artizen_Logo.png" oninput="updateQR()">
+
+    <div class="row">
+      <div>
+        <label>Logo Ratio (Max 0.3)</label>
+        <input type="number" id="imageSize" value="0.25" step="0.05" min="0.1" max="0.3" oninput="updateQR()">
+      </div>
+      <div>
+        <label>Margin (px)</label>
+        <input type="number" id="imageMargin" value="4" oninput="updateQR()">
+      </div>
+    </div>
+
+    <div class="section-title">Body Pattern</div>
+    <div class="row">
+      <div>
+        <label>Dot Style</label>
+        <select id="dotsStyle" onchange="updateQR()">
+          <option value="extra-rounded" selected>Extra Rounded</option>
+          <option value="dots">Dots</option>
+          <option value="rounded">Rounded</option>
+          <option value="classy">Classy</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div>
+        <label>Dot Color</label>
+        <input type="color" id="dotColor" value="#111111" onchange="updateQR()">
+      </div>
+    </div>
+
+    <div class="section-title">Corner Frame (Outer Squares)</div>
+    <div class="row">
+      <div>
+        <label>Corner Frame Style</label>
+        <select id="cornerSquareStyle" onchange="updateQR()">
+          <option value="extra-rounded" selected>Extra Rounded</option>
+          <option value="dot">Dot</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div>
+        <label>Frame Color</label>
+        <input type="color" id="cornerSquareColor" value="#111111" onchange="updateQR()">
+      </div>
+    </div>
+
+    <div class="section-title">Corner Eyes (Inner Dots)</div>
+    <div class="row">
+      <div>
+        <label>Eye Style</label>
+        <select id="cornerEyeStyle" onchange="updateQR()">
+          <option value="dot" selected>Dot</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div>
+        <label>Eye Color</label>
+        <input type="color" id="cornerEyeColor" value="#6366f1" onchange="updateQR()">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button onclick="downloadQR('png')">Download PNG</button>
+      <button class="secondary" onclick="downloadQR('svg')">Download SVG</button>
+    </div>
+  </div>
+
+  <div id="preview-container">
+    <div id="canvas"></div>
+  </div>
+
+  <script>
+    let uploadedBase64Image = null;
+
+    const qrCode = new QRCodeStyling({
+      width: 300,
+      height: 300,
+      type: "canvas",
+      data: "https://artizen.fund",
+      image: "https://bafybeifvsia523vhfwrdxcp3fgvb22slost57i5ljychmhuhowrcblbmya.ipfs.inbrowser.link/Artizen_Logo.png",
+      dotsOptions: { color: "#111111", type: "extra-rounded" },
+      backgroundOptions: { color: "#ffffff" },
+      imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
+      cornersSquareOptions: { color: "#111111", type: "extra-rounded" },
+      cornersDotOptions: { color: "#6366f1", type: "dot" },
+      qrOptions: { errorCorrectionLevel: 'H' }
+    });
+
+    qrCode.append(document.getElementById("canvas"));
+
+    // Handle local file upload
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedBase64Image = event.target.result;
+          document.getElementById('imageUrl').value = '';
+          updateQR();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function getLuminance(hex) {
+      const rgb = parseInt(hex.slice(1), 16);
+      const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
+    function checkContrastAndLength(text) {
+      const bgLum = getLuminance(document.getElementById("bgColor").value);
+      const dotLum = getLuminance(document.getElementById("dotColor").value);
+      const diff = Math.abs(bgLum - dotLum);
+      
+      document.getElementById("contrast-warning").style.display = diff < 80 ? "block" : "none";
+      document.getElementById("length-info").style.display = text.length > 120 ? "block" : "none";
+    }
+
+    function updateQR() {
+      const textValue = document.getElementById("text").value || "https://artizen.fund";
+      checkContrastAndLength(textValue);
+
+      const size = parseInt(document.getElementById("size").value) || 300;
+      const imageUrlInput = document.getElementById("imageUrl").value;
+      const activeImage = uploadedBase64Image || imageUrlInput;
+
+      qrCode.update({
+        width: size,
+        height: size,
+        data: textValue,
+        image: activeImage,
+        dotsOptions: {
+          color: document.getElementById("dotColor").value,
+          type: document.getElementById("dotsStyle").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bgColor").value
+        },
+        imageOptions: {
+          imageSize: Math.min(parseFloat(document.getElementById("imageSize").value) || 0.25, 0.3),
+          margin: parseInt(document.getElementById("imageMargin").value) || 4,
+          hideBackgroundDots: true
+        },
+        cornersSquareOptions: {
+          color: document.getElementById("cornerSquareColor").value,
+          type: document.getElementById("cornerSquareStyle").value
+        },
+        cornersDotOptions: {
+          color: document.getElementById("cornerEyeColor").value,
+          type: document.getElementById("cornerEyeStyle").value
+        }
+      });
+    }
+
+    function downloadQR(ext) {
+      qrCode.download({ name: "custom-qr", extension: ext });
+    }
+  </script>
+</body>
+</html>
