@@ -10,7 +10,6 @@
 
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
   
   <style>
     :root {
@@ -530,7 +529,7 @@
       <div class="btn-group">
         <button onclick="downloadQR('png')">Download PNG</button>
         <button class="secondary" onclick="downloadQR('svg')">Download SVG</button>
-        <button class="accent" id="gif-btn" onclick="downloadGIF()">Record GIF</button>
+        <button class="accent" id="mp4-btn" onclick="downloadMP4()">Record MP4</button>
       </div>
     </div>
 
@@ -561,7 +560,7 @@
         <li>Paste your project URL or IPFS hash.</li>
         <li>Upload custom center logos or translucent watermark background graphics.</li>
         <li>Apply custom linear or radial gradients across matrix dots and corners.</li>
-        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or animated GIF!</li>
+        <li>Enable shimmer and edge sparkles, then capture as PNG, SVG, or animated MP4 video!</li>
       </ul>
 
       <p><strong>Explore further:</strong></p>
@@ -833,42 +832,65 @@
       link.click();
     }
 
-    async function downloadGIF() {
-      const btn = document.getElementById("gif-btn");
+    async function downloadMP4() {
+      const btn = document.getElementById("mp4-btn");
       const originalText = btn.innerText;
       btn.innerText = "Recording...";
       btn.disabled = true;
 
       const card = document.getElementById("card-outer");
-      const frames = [];
-      const totalFrames = 12;
+      const recCanvas = document.createElement("canvas");
+      const ctx = recCanvas.getContext("2d");
 
-      for (let i = 0; i < totalFrames; i++) {
-        const frameCanvas = await html2canvas(card, { backgroundColor: null, logging: false });
-        frames.push(frameCanvas.toDataURL('image/png'));
-        await new Promise(r => setTimeout(r, 100));
-      }
+      recCanvas.width = card.clientWidth;
+      recCanvas.height = card.clientHeight;
 
-      btn.innerText = "Encoding...";
+      const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
+        ? 'video/mp4;codecs=avc1'
+        : (MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm');
 
-      gifshot.createGIF({
-        images: frames,
-        interval: 0.1,
-        gifWidth: card.clientWidth,
-        gifHeight: card.clientHeight
-      }, function (obj) {
+      const stream = recCanvas.captureStream(30);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const ext = mimeType.includes("mp4") ? "mp4" : "webm";
+        link.download = `qArt-code-animated.${ext}`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+
         btn.innerText = originalText;
         btn.disabled = false;
-        if (!obj.error) {
-          const animatedImage = obj.image;
-          const link = document.createElement('a');
-          link.download = 'qArt-code-animated.gif';
-          link.href = animatedImage;
-          link.click();
-        } else {
-          alert("GIF generation failed. Please try again.");
+      };
+
+      mediaRecorder.start();
+
+      const durationMs = 3000;
+      const fps = 30;
+      const intervalMs = 1000 / fps;
+      const totalFrames = (durationMs / 1000) * fps;
+      let currentFrame = 0;
+
+      const recordInterval = setInterval(async () => {
+        if (currentFrame >= totalFrames) {
+          clearInterval(recordInterval);
+          mediaRecorder.stop();
+          return;
         }
-      });
+
+        const frameCanvas = await html2canvas(card, { backgroundColor: null, logging: false });
+        ctx.clearRect(0, 0, recCanvas.width, recCanvas.height);
+        ctx.drawImage(frameCanvas, 0, 0);
+        currentFrame++;
+      }, intervalMs);
     }
 
     /* Edge Sparkle Orbit System */
