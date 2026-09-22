@@ -1,4 +1,4 @@
-# 𐃉⚸👁️♀︎👁️☿𐃉 qArt-code
+# 𐃉⚸👁️♀︎👁️☿𐃉 -::- qArt-code -::- <img src="./Artizen_Logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;">
 
 > Another way for **Artizens** to promote their projects, funds, and the platform.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## <img src="./Artizen_Logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;"> Features & Capabilities
+## 📜 Features & Capabilities
 
 - **Default & Custom Branding:** Pre-loaded with the **dWeb Artizen** logo, with full support to upload your own custom logos or artwork.
 - **Granular Visual Styling:**
