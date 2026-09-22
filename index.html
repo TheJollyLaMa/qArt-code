@@ -16,12 +16,12 @@
   <style>
     :root {
       --bg-deep: #0e2017;
-      --bg-panel: rgba(26, 60, 44, 0.45); /* Increased transparency for panels */
+      --bg-panel: rgba(26, 60, 44, 0.45);
       --text-main: #e0f2f1;
       --text-muted: #80cbc4;
       --primary-glow: #26a69a;
       --secondary-glow: #ffca28;
-      --border-soft: rgba(63, 110, 89, 0.4); /* Border transparency increased to blend better */
+      --border-soft: rgba(63, 110, 89, 0.4);
     }
 
     * { box-sizing: border-box; }
@@ -132,7 +132,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 2.5; /* Above overlay & banners, below content */
+      z-index: 2.5;
     }
 
     .ipfs-logo {
@@ -149,7 +149,7 @@
 
     #main-title {
       font-family: 'Great Vibes', cursive;
-      font-size: 3.6rem; /* Adjust size for cursive font */
+      font-size: 3.6rem;
       cursor: pointer;
       text-align: center;
       color: var(--primary-glow);
@@ -252,23 +252,39 @@
     #corner-logo {
       position: absolute; bottom: 20px; right: 20px;
       width: 50px; opacity: 0.5; transition: opacity 0.3s ease;
+      cursor: default;
     }
-    #corner-logo:hover { opacity: 1; }
+    #corner-logo:hover { opacity: 0.8; }
 
-    #canvas {
+    #qr-wrapper {
       background: #ffffff;
-      padding: 12px;
+      padding: 16px 16px 12px 16px;
       border-radius: 12px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.6);
       transition: transform 0.3s ease;
-      min-width: 300px;
-      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qr-wrapper:hover { transform: scale(1.02); }
+
+    #canvas {
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    #canvas:hover { transform: scale(1.02); }
+    #qr-subtext {
+      margin-top: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #111111;
+      text-align: center;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+    }
 
     .btn-group { display: flex; gap: 10px; margin-top: 15px; }
     button {
@@ -348,11 +364,13 @@
     <div class="banner-layer banner-2"></div>
     <div class="header-overlay"></div>
 
-    <!-- Header QR-like matrix animation canvas -->
+    <!-- Header QR Crawling Swarm Canvas -->
     <canvas id="header-background-canvas"></canvas>
 
     <div class="header-content">
-      <img src="./IPFS_Logo.png" alt="IPFS Logo" class="ipfs-logo">
+      <a href="https://artizen.fund" target="_blank" title="Visit Artizen Fund">
+        <img src="./Artizen_Logo.png" alt="Artizen Logo" class="ipfs-logo">
+      </a>
       <div id="main-title" onclick="openModal()">qArt-Code</div>
       <div class="header-spacer"></div>
     </div>
@@ -367,7 +385,10 @@
       <label>URL / Content</label>
       <input type="text" id="text" value="https://thejollylama.github.io/qArt-code/" oninput="updateQR()">
 
-      <div class="row">
+      <label style="margin-top: 6px; display: block;">QR Subtext Label (Optional)</label>
+      <input type="text" id="subtextInput" value="Artizen season 7" placeholder="e.g. Artizen season 7" oninput="updateSubtext()">
+
+      <div class="row" style="margin-top: 6px;">
         <div>
           <label>Size (px)</label>
           <input type="number" id="size" value="300" oninput="updateQR()">
@@ -452,9 +473,12 @@
     </div>
 
     <div id="preview-container">
-      <div id="canvas"></div>
-      
-      <a href="https://artizen.fund" target="_blank">
+      <div id="qr-wrapper">
+        <div id="canvas"></div>
+        <div id="qr-subtext">Artizen season 7</div>
+      </div>
+
+      <a href="https://revnet.money/base:6" target="_blank" title="Buy ART Token">
         <img id="corner-logo" src="./Ens_Eth_Breathe.gif" alt="Ens_Eth_Breathe Logo">
       </a>
     </div>
@@ -478,7 +502,7 @@
       <p><strong>Explore further:</strong></p>
       <p>🔗 <a href="https://github.com/TheJollyLaMa/qArt-code" target="_blank">View the Project Repo</a></p>
       
-      <p style="font-family: 'Great Vibes', cursive; font-size: 0.9em; border-top: 1px solid var(--border-soft); padding-top: 15px;">
+      <p style="font-family: 'Great Vibes', cursive; font-size: 1.9em; border-top: 1px solid var(--border-soft); padding-top: 15px;">
         <strong>TheJollyLaMa.eth</strong>
       </p>
     </div>
@@ -507,7 +531,8 @@
       const container = document.getElementById("canvas");
       container.innerHTML = "";
       qrCode.append(container);
-      updateQR(); // Loads QR on landing
+      updateQR();
+      updateSubtext();
     });
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -522,6 +547,13 @@
         reader.readAsDataURL(file);
       }
     });
+
+    function updateSubtext() {
+      const val = document.getElementById("subtextInput").value;
+      const subtextEl = document.getElementById("qr-subtext");
+      subtextEl.innerText = val;
+      subtextEl.style.display = val.trim() ? "block" : "none";
+    }
 
     function getLuminance(hex) {
       const rgb = parseInt(hex.slice(1), 16);
@@ -546,17 +578,23 @@
       const imageUrlInput = document.getElementById("imageUrl").value;
       const activeImage = uploadedBase64Image || imageUrlInput;
 
+      // Match subtext font color to dot color for design consistency
+      const dotColor = document.getElementById("dotColor").value;
+      const bgColor = document.getElementById("bgColor").value;
+      document.getElementById("qr-subtext").style.color = dotColor;
+      document.getElementById("qr-wrapper").style.backgroundColor = bgColor;
+
       qrCode.update({
         width: size,
         height: size,
         data: textValue,
         image: activeImage,
         dotsOptions: {
-          color: document.getElementById("dotColor").value,
+          color: dotColor,
           type: document.getElementById("dotsStyle").value
         },
         backgroundOptions: {
-          color: document.getElementById("bgColor").value
+          color: bgColor
         },
         imageOptions: {
           imageSize: Math.min(parseFloat(document.getElementById("imageSize").value) || 0.25, 0.3),
@@ -574,8 +612,46 @@
       });
     }
 
-    function downloadQR(ext) {
-      qrCode.download({ name: "qArt-code", extension: ext });
+    async function downloadQR(ext) {
+      const subtext = document.getElementById("subtextInput").value.trim();
+      if (ext === 'svg' || !subtext) {
+        qrCode.download({ name: "qArt-code", extension: ext });
+        return;
+      }
+
+      // Render merged canvas with subtext for PNG download
+      const rawCanvas = document.querySelector("#canvas canvas");
+      if (!rawCanvas) {
+        qrCode.download({ name: "qArt-code", extension: ext });
+        return;
+      }
+
+      const mergedCanvas = document.createElement("canvas");
+      const ctx = mergedCanvas.getContext("2d");
+      const subtextHeight = 36;
+      const padding = 16;
+
+      mergedCanvas.width = rawCanvas.width + (padding * 2);
+      mergedCanvas.height = rawCanvas.height + (padding * 2) + subtextHeight;
+
+      // Fill background
+      ctx.fillStyle = document.getElementById("bgColor").value;
+      ctx.fillRect(0, 0, mergedCanvas.width, mergedCanvas.height);
+
+      // Draw original QR canvas
+      ctx.drawImage(rawCanvas, padding, padding);
+
+      // Draw subtext
+      ctx.fillStyle = document.getElementById("dotColor").value;
+      ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(subtext, mergedCanvas.width / 2, rawCanvas.height + padding + 24);
+
+      // Trigger download
+      const link = document.createElement("a");
+      link.download = "qArt-code.png";
+      link.href = mergedCanvas.toDataURL("image/png");
+      link.click();
     }
 
     function openModal() {
@@ -649,7 +725,7 @@
 
     animateParticles();
 
-    /* Header QR Dot-Matrix Background Animation Logic */
+    /* Header Crawling QR Worm / Swarm Animation */
     const headerCanvas = document.getElementById('header-background-canvas');
     const headerCtx = headerCanvas.getContext('2d');
 
@@ -661,72 +737,93 @@
     resizeHeaderCanvas();
     window.addEventListener('resize', resizeHeaderCanvas);
 
-    let headerParticles = [];
-    const gridRows = 6;
-    const gridCols = Math.floor(window.innerWidth / 35);
-    const jitterFactor = 6;
+    const numSwarmDots = 48;
+    let swarmDots = [];
+    let wormHeadX = -100;
+    const wormSpeed = 0.8;
 
-    function initHeaderMatrix() {
-      headerParticles = [];
-      const colWidth = headerCanvas.width / gridCols;
-      const rowHeight = headerCanvas.height / gridRows;
-
-      for (let r = 0; r < gridRows; r++) {
-        for (let c = 0; c < gridCols; c++) {
-          headerParticles.push({
-            x: c * colWidth + colWidth / 2 + (Math.random() - 0.5) * jitterFactor,
-            y: r * rowHeight + rowHeight / 2 + (Math.random() - 0.5) * jitterFactor,
-            homeX: c * colWidth + colWidth / 2,
-            homeY: r * rowHeight + rowHeight / 2,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: (Math.random() - 0.5) * 0.4,
-            radius: Math.random() * 1.5 + 2
-          });
-        }
+    function initSwarmDots() {
+      swarmDots = [];
+      for (let i = 0; i < numSwarmDots; i++) {
+        swarmDots.push({
+          offsetX: (Math.random() - 0.5) * 140,
+          offsetY: (Math.random() - 0.5) * 60,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          radius: Math.random() * 3 + 3,
+          isSquare: Math.random() > 0.4
+        });
       }
     }
-    initHeaderMatrix();
+    initSwarmDots();
 
-    function animateHeaderParticles() {
+    function animateHeaderSwarm() {
       headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
 
-      for (let i = 0; i < headerParticles.length; i++) {
-        let p1 = headerParticles[i];
+      const centerY = headerCanvas.height / 2;
 
-        p1.x += p1.vx;
-        p1.y += p1.vy;
+      wormHeadX += wormSpeed;
+      if (wormHeadX > headerCanvas.width + 120) {
+        wormHeadX = -120;
+        initSwarmDots();
+      }
 
-        // Keep dots close to matrix positions to retain grid structure
-        if (Math.abs(p1.x - p1.homeX) > jitterFactor * 1.5) p1.vx *= -1;
-        if (Math.abs(p1.y - p1.homeY) > jitterFactor * 1.5) p1.vy *= -1;
+      const maxDist = 42;
+      for (let i = 0; i < swarmDots.length; i++) {
+        let d1 = swarmDots[i];
+        let absX1 = wormHeadX + d1.offsetX;
+        let absY1 = centerY + d1.offsetY;
 
-        headerCtx.beginPath();
-        headerCtx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-        headerCtx.fillStyle = '#26a69a';
-        headerCtx.fill();
+        for (let j = i + 1; j < swarmDots.length; j++) {
+          let d2 = swarmDots[j];
+          let absX2 = wormHeadX + d2.offsetX;
+          let absY2 = centerY + d2.offsetY;
 
-        // Connect neighboring dots in matrix for connector style
-        const maxDist = 65;
-        for (let j = i + 1; j < headerParticles.length; j++) {
-          let p2 = headerParticles[j];
-          let dx = p1.x - p2.x;
-          let dy = p1.y - p2.y;
+          let dx = absX1 - absX2;
+          let dy = absY1 - absY2;
           let dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDist) {
             headerCtx.beginPath();
-            headerCtx.moveTo(p1.x, p1.y);
-            headerCtx.lineTo(p2.x, p2.y);
-            headerCtx.strokeStyle = `rgba(38, 166, 154, ${(1 - dist / maxDist) * 0.45})`;
-            headerCtx.lineWidth = 0.75;
+            headerCtx.moveTo(absX1, absY1);
+            headerCtx.lineTo(absX2, absY2);
+            headerCtx.lineWidth = 1.8;
+            headerCtx.strokeStyle = `rgba(38, 166, 154, ${(1 - dist / maxDist) * 0.7})`;
             headerCtx.stroke();
           }
         }
       }
-      requestAnimationFrame(animateHeaderParticles);
+
+      for (let i = 0; i < swarmDots.length; i++) {
+        let dot = swarmDots[i];
+
+        dot.offsetX += dot.vx;
+        dot.offsetY += dot.vy;
+
+        if (Math.abs(dot.offsetX) > 70) dot.vx *= -1;
+        if (Math.abs(dot.offsetY) > 30) dot.vy *= -1;
+
+        let posX = wormHeadX + dot.offsetX;
+        let posY = centerY + dot.offsetY;
+
+        headerCtx.fillStyle = '#26a69a';
+
+        if (dot.isSquare) {
+          const r = dot.radius * 1.6;
+          headerCtx.beginPath();
+          headerCtx.roundRect(posX - r / 2, posY - r / 2, r, r, 2);
+          headerCtx.fill();
+        } else {
+          headerCtx.beginPath();
+          headerCtx.arc(posX, posY, dot.radius, 0, Math.PI * 2);
+          headerCtx.fill();
+        }
+      }
+
+      requestAnimationFrame(animateHeaderSwarm);
     }
 
-    animateHeaderParticles();
+    animateHeaderSwarm();
 
   </script>
 </body>
