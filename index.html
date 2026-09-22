@@ -34,8 +34,7 @@
       color: var(--text-main);
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
       position: relative;
     }
 
@@ -55,7 +54,7 @@
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: url('./qArt_code_background.jpeg') center/cover no-repeat;
-      opacity: 0.35; /* Slightly increased for better visibility through transparent panels */
+      opacity: 0.35;
       filter: blur(2px);
       z-index: 0;
       animation: bgScroll 60s linear infinite;
@@ -108,7 +107,7 @@
     .header-overlay {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(8, 20, 15, 0.7); /* Darkened for strong contrast with neon animation */
+      background: rgba(8, 20, 15, 0.7);
       backdrop-filter: blur(2px);
       z-index: 2;
     }
@@ -199,7 +198,6 @@
       display: flex;
       gap: 30px;
       padding: 30px;
-      overflow: hidden;
     }
 
     .controls {
@@ -208,12 +206,10 @@
       gap: 12px;
       width: 380px;
       background: var(--bg-panel);
-      backdrop-filter: blur(16px); /* High blur keeps text crisp over transparent background */
+      backdrop-filter: blur(16px);
       padding: 24px;
       border-radius: 12px;
       border: 1px solid var(--border-soft);
-      max-height: 95%;
-      overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
@@ -268,6 +264,7 @@
       border: 1px solid var(--border-soft);
       padding: 40px;
       position: relative;
+      min-height: 400px;
     }
 
     #corner-logo {
@@ -287,6 +284,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      max-width: 100%;
     }
 
     #qr-wrapper:hover { transform: scale(1.02); }
@@ -295,6 +293,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    #canvas canvas {
+      max-width: 100% !important;
+      height: auto !important;
     }
 
     #qr-subtext {
@@ -305,6 +310,7 @@
       text-align: center;
       font-family: inherit;
       letter-spacing: 0.5px;
+      word-break: break-word;
     }
 
     .btn-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -374,6 +380,61 @@
     #about-content ul { color: var(--text-muted); margin-bottom: 20px; }
     #about-content a { color: var(--primary-glow); font-weight: bold; text-decoration: none; }
     #about-content a:hover { color: #fff; text-shadow: 0 0 5px var(--primary-glow); }
+
+    /* Mobile Vertical Responsive Layout */
+    @media (max-width: 768px) {
+      header {
+        height: auto;
+        padding: 12px 0;
+      }
+
+      .header-content {
+        padding: 0 15px;
+      }
+
+      .ipfs-logo {
+        height: 32px;
+      }
+
+      #main-title {
+        font-size: 2.6rem;
+      }
+
+      .title-subtitle {
+        font-size: 0.7rem;
+      }
+
+      .header-spacer {
+        width: 32px;
+      }
+
+      main {
+        flex-direction: column-reverse; /* Preview on top, controls stacked below */
+        padding: 16px;
+        gap: 20px;
+      }
+
+      .controls {
+        width: 100%;
+        max-height: none;
+        padding: 16px;
+      }
+
+      #preview-container {
+        width: 100%;
+        padding: 24px 16px 60px 16px;
+        min-height: auto;
+      }
+
+      #qr-wrapper {
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -768,7 +829,6 @@
       for (let i = 0; i < numSwarmDots; i++) {
         swarmDots.push({
           offsetX: (Math.random() - 0.5) * 160,
-          // Expand swarm offsets to utilize the full top-to-bottom height
           yPos: Math.random() * (canvasH - 16) + 8,
           vx: (Math.random() - 0.5) * 0.7,
           vy: (Math.random() - 0.5) * 0.7,
@@ -792,7 +852,6 @@
 
       const maxDist = 55;
 
-      // Draw connection lines between nearby swarm points
       for (let i = 0; i < swarmDots.length; i++) {
         let d1 = swarmDots[i];
         let absX1 = wormHeadX + d1.offsetX;
@@ -818,11 +877,9 @@
         }
       }
 
-      // Strong neon glow layer
       headerCtx.shadowColor = '#00ffc8';
       headerCtx.shadowBlur = 14;
 
-      // Render dots and squares across the full header height
       for (let i = 0; i < swarmDots.length; i++) {
         let dot = swarmDots[i];
 
@@ -855,7 +912,6 @@
     }
 
     animateHeaderSwarm();
-
   </script>
 </body>
 </html>
