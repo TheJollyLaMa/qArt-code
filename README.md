@@ -6,13 +6,13 @@
 
 ---
 
-## <img src="./logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;"> Designed for Artizens
+## <img src="./Artizen_Logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;"> Designed for Artizens
 
 **qArt-code** is built to give creators and innovators an effortless way to share their work. Whether you are driving traffic to a crowd-funding campaign, an art installation, or a decentralized application, qArt-code helps you design high-impact, scannable QR codes in seconds.
 
 ---
 
-## <img src="./logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;"> Features & Capabilities
+## <img src="./Artizen_Logo.png" alt="Artizen Logo" height="22" style="vertical-align: middle;"> Features & Capabilities
 
 - **Default & Custom Branding:** Pre-loaded with the **dWeb Artizen** logo, with full support to upload your own custom logos or artwork.
 - **Granular Visual Styling:**
