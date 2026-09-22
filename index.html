@@ -336,7 +336,7 @@
       <input type="file" id="bgFileInput" accept="image/*" style="margin-bottom: 6px;">
       
       <label>Or Watermark Image URL</label>
-      <input type="text" id="bgImageUrl" value="./qArt_code_background.jpeg" placeholder="./qArt_code_background.jpeg" oninput="updateQR()">
+      <input type="text" id="bgImageUrl" value="./qArt_code_background.jpeg" placeholder="./qArt_code_background.jpeg" oninput="handleWatermarkUrlInput()">
 
       <div class="row" style="margin-top: 6px;">
         <div>
@@ -576,6 +576,7 @@
   <script>
     let uploadedBase64Image = null;
     let uploadedWatermarkImage = null;
+    let watermarkImgElement = null;
 
     const qrCode = new QRCodeStyling({
       width: 300,
@@ -592,7 +593,7 @@
           colorStops: [{ offset: 0, color: "#111111" }, { offset: 1, color: "#26a69a" }]
         }
       },
-      backgroundOptions: { color: "#ffffff" },
+      backgroundOptions: { color: "transparent" },
       imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
       cornersSquareOptions: {
         type: "extra-rounded",
@@ -613,15 +614,42 @@
       qrOptions: { errorCorrectionLevel: 'H' }
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       const container = document.getElementById("canvas");
       container.innerHTML = "";
       qrCode.append(container);
+
+      const defaultWatermarkSrc = document.getElementById("bgImageUrl").value;
+      if (defaultWatermarkSrc) {
+        await loadWatermarkImage(defaultWatermarkSrc);
+      }
+
       updateQR();
       updateSubtext();
       updateShimmerSettings();
       initSparkles();
     });
+
+    function loadWatermarkImage(src) {
+      return new Promise((resolve) => {
+        if (!src) {
+          watermarkImgElement = null;
+          resolve(null);
+          return;
+        }
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          watermarkImgElement = img;
+          resolve(img);
+        };
+        img.onerror = () => {
+          watermarkImgElement = null;
+          resolve(null);
+        };
+        img.src = src;
+      });
+    }
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -640,14 +668,22 @@
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
           uploadedWatermarkImage = event.target.result;
           document.getElementById('bgImageUrl').value = '';
+          await loadWatermarkImage(uploadedWatermarkImage);
           updateQR();
         };
         reader.readAsDataURL(file);
       }
     });
+
+    async function handleWatermarkUrlInput() {
+      uploadedWatermarkImage = null;
+      const url = document.getElementById("bgImageUrl").value;
+      await loadWatermarkImage(url);
+      updateQR();
+    }
 
     function updateSubtext() {
       const val = document.getElementById("subtextInput").value;
@@ -716,7 +752,7 @@
       };
     }
 
-    function updateQR() {
+    async function updateQR() {
       const textValue = document.getElementById("text").value || "https://thejollylama.github.io/qArt-code/";
       checkContrastAndLength(textValue);
 
@@ -746,7 +782,7 @@
         data: textValue,
         image: activeImage,
         dotsOptions: dotsOpt,
-        backgroundOptions: { color: bgColor },
+        backgroundOptions: { color: "transparent" },
         imageOptions: {
           imageSize: Math.min(parseFloat(document.getElementById("imageSize").value) || 0.25, 0.3),
           margin: parseInt(document.getElementById("imageMargin").value) || 4,
@@ -756,44 +792,45 @@
         cornersDotOptions: cornerEyeOpt
       });
 
-      // Render Translucent Watermark Overlay reliably onto canvas
-      setTimeout(applyWatermarkToCanvas, 150);
+      requestAnimationFrame(() => {
+        setTimeout(applyWatermarkToCanvas, 60);
+      });
     }
 
     function applyWatermarkToCanvas() {
-      const bgImgSrc = uploadedWatermarkImage || document.getElementById("bgImageUrl").value;
       const opacity = parseFloat(document.getElementById("bgOpacity").value);
       const qrCanvas = document.querySelector("#canvas canvas");
 
-      if (!qrCanvas || isNaN(opacity) || opacity <= 0) return;
+      if (!qrCanvas) return;
 
+      const width = qrCanvas.width;
+      const height = qrCanvas.height;
       const ctx = qrCanvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = bgImgSrc;
-      img.onload = () => {
-        // Create an offscreen canvas to blend watermark over base background before dots
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = qrCanvas.width;
-        tempCanvas.height = qrCanvas.height;
-        const tempCtx = tempCanvas.getContext("2d");
 
-        // 1. Fill base background color
-        tempCtx.fillStyle = document.getElementById("bgColor").value;
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      // 1. Snapshot original matrix layer generated by qr-code-styling
+      const matrixBuffer = document.createElement("canvas");
+      matrixBuffer.width = width;
+      matrixBuffer.height = height;
+      const matrixCtx = matrixBuffer.getContext("2d");
+      matrixCtx.drawImage(qrCanvas, 0, 0);
 
-        // 2. Draw watermark with user opacity
-        tempCtx.globalAlpha = opacity;
-        tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+      // 2. Clear primary canvas
+      ctx.clearRect(0, 0, width, height);
 
-        // 3. Composite original QR code matrix on top
-        tempCtx.globalAlpha = 1.0;
-        tempCtx.drawImage(qrCanvas, 0, 0);
+      // 3. Draw base background color
+      ctx.fillStyle = document.getElementById("bgColor").value;
+      ctx.fillRect(0, 0, width, height);
 
-        // 4. Paint final output back to active canvas
-        ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
-        ctx.drawImage(tempCanvas, 0, 0);
-      };
+      // 4. Draw translucent watermark image layer
+      if (watermarkImgElement && watermarkImgElement.complete && opacity > 0) {
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.drawImage(watermarkImgElement, 0, 0, width, height);
+        ctx.restore();
+      }
+
+      // 5. Composite QR matrix back on top
+      ctx.drawImage(matrixBuffer, 0, 0);
     }
 
     async function downloadQR(ext) {
