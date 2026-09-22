@@ -5,21 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>qArt-Code 🎨📱</title>
   
-  <!-- Tiny T-Rex Favicon Data URI -->
-  <link rel="icon" href="./favicon.png">
+  <!-- Umbrella QR Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a3c2c'/><path d='M20 45 C20 25, 80 25, 80 45 Z' fill='%2326a69a'/><path d='M50 45 L50 75 C50 80, 40 80, 40 75' stroke='%23e0f2f1' stroke-width='6' fill='none' stroke-linecap='round'/><rect x='30' y='25' width='10' height='10' fill='%23ffca28'/><rect x='60' y='25' width='10' height='10' fill='%23ffca28'/></svg>">
   
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   
   <style>
     :root {
-      /* Palette: Relaxing Greens, Glimmer, and Glow */
-      --bg-deep: #0e2017;           /* Deep Forest Base */
-      --bg-panel: #1a3c2c;         /* Panel Green */
-      --text-main: #e0f2f1;       /* Light Mint */
-      --text-muted: #80cbc4;       /* Subdued Mint */
-      --primary-glow: #26a69a;     /* Glimmer Green */
-      --secondary-glow: #ffca28;   /* Contrast Shine Gold */
-      --border-soft: #3f6e59;     /* Soft Panel Border */
+      --bg-deep: #0e2017;
+      --bg-panel: #1a3c2c;
+      --text-main: #e0f2f1;
+      --text-muted: #80cbc4;
+      --primary-glow: #26a69a;
+      --secondary-glow: #ffca28;
+      --border-soft: #3f6e59;
     }
 
     * { box-sizing: border-box; }
@@ -36,12 +35,12 @@
       overflow: hidden;
     }
 
-    /* CSS Trick: Subtle, moving background using our qArt-code image */
+    /* Moving background using qArt_code_background.jpeg */
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: url('./qArt-code.jpeg') center/cover no-repeat;
-      opacity: 0.1;
+      background: url('./qArt_code_background.jpeg') center/cover no-repeat;
+      opacity: 0.12;
       filter: blur(5px);
       z-index: -1;
       animation: bgScroll 60s linear infinite;
@@ -52,24 +51,85 @@
       100% { background-position: center bottom; }
     }
 
-    /* Fancy Glimmering Header */
+    /* Header Container */
     header {
-      background: linear-gradient(135deg, rgba(26,60,44,0.9), rgba(14,32,23,0.95));
+      position: relative;
+      height: 110px;
       border-bottom: 2px solid var(--border-soft);
-      padding: 20px 40px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(5px);
+      justify-content: center;
+      overflow: hidden;
       z-index: 10;
     }
 
-    /* Clickable, Glowing Title */
+    /* Fading Banner Layers */
+    .banner-layer {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+    }
+
+    .banner-1 {
+      background-image: url('./header_banner.jpeg');
+      animation: crossFade 12s infinite ease-in-out;
+    }
+
+    .banner-2 {
+      background-image: url('./header_banner2.jpeg');
+      animation: crossFade 12s infinite ease-in-out;
+      animation-delay: -6s; /* Offsets banner 2 by half the total cycle duration */
+    }
+
+    @keyframes crossFade {
+      0% { opacity: 0.2; }
+      40% { opacity: 0.85; }
+      50% { opacity: 0.85; }
+      90% { opacity: 0.2; }
+      100% { opacity: 0.2; }
+    }
+
+    /* Dark overlay for contrast over banner images */
+    .header-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(14, 32, 23, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 2;
+    }
+
+    /* Header Content Layout */
+    .header-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ipfs-logo {
+      height: 42px;
+      width: auto;
+      opacity: 0.85;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .ipfs-logo:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
     #main-title {
       font-size: 2.8rem;
       font-weight: 800;
       letter-spacing: -2px;
       cursor: pointer;
+      text-align: center;
       background: linear-gradient(to right, #ffffff, var(--secondary-glow), var(--primary-glow), #ffffff);
       background-size: 300%;
       -webkit-background-clip: text;
@@ -88,7 +148,9 @@
       100% { background-position: 300%; }
     }
 
-    /* Interface and Controls */
+    /* Placeholder div to keep title strictly centered */
+    .header-spacer { width: 42px; }
+
     main {
       flex: 1;
       display: flex;
@@ -150,7 +212,6 @@
       cursor: pointer;
     }
 
-    /* Preview Canvas Area */
     #preview-container {
       flex: 1;
       display: flex;
@@ -164,16 +225,15 @@
       position: relative;
     }
 
-    /* Corner Artizen Logo */
     #corner-logo {
       position: absolute; bottom: 20px; right: 20px;
-      width: 50px; opacity: 0.3; transition: opacity 0.3s ease;
+      width: 50px; opacity: 0.4; transition: opacity 0.3s ease;
     }
     #corner-logo:hover { opacity: 1; }
 
     #canvas {
       background: #fff;
-      padding: 0px; /* Quieter margin is now handled by qr-code-styling itself */
+      padding: 0px;
       border-radius: 12px;
       box-shadow: 0 15px 40px rgba(0,0,0,0.6);
       transition: transform 0.3s ease;
@@ -181,7 +241,6 @@
 
     #canvas:hover { transform: scale(1.02); }
 
-    /* Interactive Buttons */
     .btn-group { display: flex; gap: 10px; margin-top: 15px; }
     button {
       flex: 1;
@@ -214,7 +273,7 @@
     #contrast-warning { background: #ef444422; border: 1px solid #ef4444; color: #fca5a5; }
     #length-info { background: #3b82f622; border: 1px solid #3b82f6; color: #93c5fd; }
 
-    /* --- About Modal Styles --- */
+    /* Modal */
     #about-modal {
       display: none;
       position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
@@ -248,14 +307,20 @@
     #about-content ul { color: var(--text-muted); margin-bottom: 20px; }
     #about-content a { color: var(--primary-glow); font-weight: bold; text-decoration: none; }
     #about-content a:hover { color: #fff; text-shadow: 0 0 5px var(--primary-glow); }
-
   </style>
 </head>
 <body>
 
-  <!-- Glowing interactive Header -->
   <header>
-    <div id="main-title" onclick="openModal()">qArt-Code</div>
+    <div class="banner-layer banner-1"></div>
+    <div class="banner-layer banner-2"></div>
+    <div class="header-overlay"></div>
+
+    <div class="header-content">
+      <img src="./ipfs_logo.png" alt="IPFS Logo" class="ipfs-logo">
+      <div id="main-title" onclick="openModal()">qArt-Code</div>
+      <div class="header-spacer"></div>
+    </div>
   </header>
 
   <main>
@@ -283,7 +348,7 @@
       <input type="file" id="fileInput" accept="image/*" style="margin-bottom: 6px;">
       
       <label>Or Image URL / IPFS Gateway</label>
-      <input type="text" id="imageUrl" value="https://bafybeifvsia523vhfwrdxcp3fgvb22slost57i5ljychmhuhowrcblbmya.ipfs.inbrowser.link/Artizen_Logo.png" oninput="updateQR()">
+      <input type="text" id="imageUrl" value="./ens_eth_breathe.png" oninput="updateQR()">
 
       <div class="row">
         <div>
@@ -341,7 +406,7 @@
         </div>
         <div>
           <label>Eye Color</label>
-          <input type="color" id="cornerEyeColor" value="#6366f1" onchange="updateQR()">
+          <input type="color" id="cornerEyeColor" value="#26a69a" onchange="updateQR()">
         </div>
       </div>
 
@@ -354,20 +419,18 @@
     <div id="preview-container">
       <div id="canvas"></div>
       
-      <!-- Artizen logo in the corner -->
-      <a href="https://bafybeibwhoqzf6nxsh5ctqx5o4uezwhnqncm3uztaimzuvcfljfcjwknqi.ipfs.inbrowser.link/" target="_blank">
-        <img id="corner-logo" src="https://bafybeifvsia523vhfwrdxcp3fgvb22slost57i5ljychmhuhowrcblbmya.ipfs.inbrowser.link/Artizen_Logo.png" alt="Artizen Logo">
+      <a href="https://artizen.fund" target="_blank">
+        <img id="corner-logo" src="./ens_eth_breathe.png" alt="ens_eth_breathe Logo">
       </a>
     </div>
   </main>
 
-  <!-- --- The About Modal --- -->
   <div id="about-modal">
     <div id="about-content">
       <span id="close-modal" onclick="closeModal()">&times;</span>
       <h2>About qArt-Code 🎨📱</h2>
-      <p>qArt-Code is a fully decentralized, custom QR studio designed for creators in the Artizen and ArtFi ecosystem.</p>
-      <p>This is where art and utility intersect. We don't make plain, gloomy QR codes. We give them glimmer, shine, and personality—perfect for linking physical art, digital grants, or repository funds on IPFS.</p>
+      <p>qArt-Code is a fully decentralized, custom QR studio designed for creators in the Artizen ecosystem.</p>
+      <p>This is where art and utility intersect—giving your links glimmer, shine, and personality for physical art, digital grants, or repository funds on IPFS.</p>
       
       <p><strong>What to do:</strong></p>
       <ul>
@@ -392,28 +455,27 @@
     const qrCode = new QRCodeStyling({
       width: 300,
       height: 300,
-      margin: 10, // Default quiet zone border is critical for reliable scanning.
+      margin: 10,
       type: "canvas",
       data: "https://thejollylama.github.io/qArt-code/",
-      image: "https://bafybeifvsia523vhfwrdxcp3fgvb22slost57i5ljychmhuhowrcblbmya.ipfs.inbrowser.link/Artizen_Logo.png",
+      image: "./ens_eth_breathe.png",
       dotsOptions: { color: "#111111", type: "extra-rounded" },
       backgroundOptions: { color: "#ffffff" },
       imageOptions: { hideBackgroundDots: true, imageSize: 0.25, margin: 4, crossOrigin: "anonymous" },
       cornersSquareOptions: { color: "#111111", type: "extra-rounded" },
-      cornersDotOptions: { color: "#6366f1", type: "dot" },
+      cornersDotOptions: { color: "#26a69a", type: "dot" },
       qrOptions: { errorCorrectionLevel: 'H' }
     });
 
     qrCode.append(document.getElementById("canvas"));
 
-    // Handle local file upload
     document.getElementById('fileInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
           uploadedBase64Image = event.target.result;
-          document.getElementById('imageUrl').value = ''; // Clear text input
+          document.getElementById('imageUrl').value = '';
           updateQR();
         };
         reader.readAsDataURL(file);
@@ -436,7 +498,7 @@
     }
 
     function updateQR() {
-      const textValue = document.getElementById("text").value || "https://artizen.fund";
+      const textValue = document.getElementById("text").value || "https://thejollylama.github.io/qArt-code/";
       checkContrastAndLength(textValue);
 
       const size = parseInt(document.getElementById("size").value) || 300;
@@ -475,7 +537,6 @@
       qrCode.download({ name: "qArt-code", extension: ext });
     }
 
-    // Modal control functions
     function openModal() {
       document.getElementById("about-modal").classList.add("open");
     }
@@ -484,7 +545,6 @@
       document.getElementById("about-modal").classList.remove("open");
     }
 
-    // Close modal by clicking outside
     window.onclick = function(event) {
       const modal = document.getElementById("about-modal");
       if (event.target == modal) {
